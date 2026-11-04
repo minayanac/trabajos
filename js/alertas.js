@@ -14,7 +14,7 @@
 //     quita las expiradas y refresca la UI.
 // ============================================================
 
-import { reproducirSonidoAlerta, detenerSonidoAlerta } from "./notifications.js";
+//import { reproducirSonidoAlerta, detenerSonidoAlerta } from "./notifications.js";
 
 // ----------------------------------------------------------
 // Niveles de alerta
@@ -264,82 +264,7 @@ function tiempoRestanteZona(zona) {
 // MOSTRAR ALERTA COMPLETA
 // ==========================================================
 export async function mostrarAlertaCompleta(datos = {}) {
-    try {
-        libreYaCerradoPorUsuario = false;
-        asegurarEstructuraDOM();
-
-        const nivelKey = NIVELES_ALERTA[datos.nivel] ? datos.nivel : "roja";
-        const distrito = datos.distrito || `Zona ${estado.zonasActivas.size + 1}`;
-        const duracionMin = (datos.duracionMin && datos.duracionMin > 0)
-            ? datos.duracionMin : DURACION_TIMER_MINUTOS;
-        const tsInicio = (typeof datos.timestampInicio === "number" && datos.timestampInicio > 0)
-            ? datos.timestampInicio : Date.now();
-
-        const yaExistia = estado.zonasActivas.has(distrito);
-
-        estado.zonasActivas.set(distrito, {
-            nivel: nivelKey, nivelKey, distrito,
-            lat: datos.lat ?? null, lng: datos.lng ?? null,
-            duracionMin, timestampInicio: tsInicio,
-            sectorOriginal: datos.sectorOriginal || null,
-            inicio: datos.inicio || null, fin: datos.fin || null,
-            titulo: datos.titulo || `⚡ ALERTA ${nivelKey.toUpperCase()} — ${distrito}`,
-            mensaje: datos.mensaje || `Actividad eléctrica detectada en ${distrito}.`
-        });
-
-        // Arrancar el contador maestro en cuanto haya una zona
-        iniciarIntervalMaestro();
-
-        // Pintar polígono del mapa
-        if (datos.distrito) {
-            const mod = await obtenerModuloMapa();
-            if (mod && typeof mod.pintarPoligonoZona === "function") {
-                const nivel = NIVELES_ALERTA[nivelKey];
-                await mod.pintarPoligonoZona(datos.distrito, nivel.color);
-            }
-        }
-
-        // Rayo + círculo (solo si es nueva la zona)
-        if (!yaExistia && datos.lat != null && datos.lng != null) {
-            const mod = await obtenerModuloMapa();
-            if (mod && typeof mod.iluminarDistrito === "function") {
-                if (capasRayos.has(distrito)) {
-                    try { capasRayos.get(distrito).detener(); } catch (e) {}
-                    capasRayos.delete(distrito);
-                }
-                const capa = await mod.iluminarDistrito(datos.lat, datos.lng, nivelKey);
-                if (capa) capasRayos.set(distrito, capa);
-            }
-        }
-
-        // Cola de banners
-        if (!yaExistia) {
-            estado.colaBanners.push(distrito);
-            estado.colaBanners.sort((a, b) => {
-                const za = estado.zonasActivas.get(a);
-                const zb = estado.zonasActivas.get(b);
-                if (!za || !zb) return 0;
-                return NIVELES_ALERTA[zb.nivelKey].orden - NIVELES_ALERTA[za.nivelKey].orden;
-            });
-        }
-
-        if (estado.bannerActual === null) {
-            mostrarSiguienteBanner();
-        } else if (estado.bannerActual === distrito) {
-            pintarBannerDeZona(estado.zonasActivas.get(distrito));
-        } else {
-            actualizarIndicadorCola();
-        }
-
-        actualizarBarraYTarjetaAgregadas();
-
-        if (!yaExistia && nivelKey !== "vigilancia") {
-            try { reproducirSonidoAlerta(30); } catch (e) {}
-        }
-
-    } catch (e) {
-        console.error("alertas.js: error al mostrar alerta", e);
-    }
+    //desactivado
 }
 
 // ==========================================================
@@ -593,39 +518,7 @@ export function mostrarBarraTarjetaLibre() {
 // MOSTRAR LIBRE
 // ==========================================================
 export function mostrarAlertaLibre() {
-    try {
-        if (libreYaCerradoPorUsuario) {
-            asegurarEstructuraDOM();
-            mostrarBarraTarjetaLibre();
-            return;
-        }
-
-        asegurarEstructuraDOM();
-        detenerIntervalMaestro();
-        detenerSonidoAlerta();
-
-        for (const [, capa] of capasRayos.entries()) {
-            try { capa.detener(); } catch (e) {}
-        }
-        capasRayos.clear();
-
-        obtenerModuloMapa().then(mod => {
-            if (mod && typeof mod.limpiarPoligonosZona === "function") {
-                mod.limpiarPoligonosZona();
-            }
-        }).catch(() => {});
-
-        estado.zonasActivas.clear();
-        estado.colaBanners = [];
-        estado.bannerActual = null;
-
-        abrirOverlayLibre();
-        mostrarBarraTarjetaLibre();
-
-        setTimeout(() => document.getElementById("al-btn-cerrar")?.focus(), 1000);
-    } catch (e) {
-        console.error("alertas.js: error al mostrar alerta libre", e);
-    }
+    //desactivado
 }
 
 // ==========================================================
@@ -755,7 +648,9 @@ function ocultarTarjeta() {
     tarjeta?.classList.remove("al-visible");
 }
 
-export function cerrarAlerta() { cerrarBannerActual(); }
+export function cerrarAlerta() { 
+    //desactivado
+}
 
 export function cerrarAlertaTotal() {
     cerrarBanner();
