@@ -887,3 +887,10 @@ body {
     margin-top: 2px;
     white-space: nowrap;
 }
+/* ELIMINAR BARRA Y TARJETAS DE ALERTAS */
+#al-barra-superior,
+#al-tarjeta,
+#al-barra-cerrar,
+#al-tarjeta-cerrar {
+    display: none !important;
+}
