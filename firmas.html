@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Personal y Firmas - Antamina</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- SheetJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        corporate: {
+                            navy: '#002B49',
+                            dark: '#001D33',
+                            blue: '#005587',
+                            gold: '#D99B26',
+                            amber: '#F2A900',
+                            slate: '#334155'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-width: 320px;
+        }
+
+        .highlight {
+            background-color: #fef08a;
+            color: #854d0e;
+            padding: 0.1rem 0.2rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+
+        /* Barra de desplazamiento */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Evitar que los filtros excedan su contenedor */
+        #filterArea,
+        #filterCargo {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        /* Evitar que el texto de la tabla ensanche toda la página */
+        #tableBody td {
+            overflow-wrap: anywhere;
+        }
+
+        /* Mejorar la experiencia táctil en móviles */
+        input,
+        select,
+        button {
+            touch-action: manipulation;
+        }
+
+        /* Ajustes para pantallas pequeñas */
+        @media (max-width: 639px) {
+            header .header-actions {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                width: 100%;
+            }
+
+            header .header-actions button,
+            header .header-actions label {
+                justify-content: center;
+                min-width: 0;
+                text-align: center;
+            }
+
+            #searchInput {
+                font-size: 16px;
+            }
+
+            #filterArea,
+            #filterCargo {
+                width: 100%;
+            }
+
+            #paginationControls {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-full flex flex-col font-sans text-slate-800 antialiased">
+
+    <!-- ENCABEZADO CORPORATIVO -->
+    <header class="bg-corporate-navy text-white shadow-lg sticky top-0 z-50 border-b-4 border-corporate-gold">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+
+            <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
+
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 shrink-0 rounded-lg bg-corporate-gold flex items-center justify-center text-corporate-navy text-xl font-bold shadow-md">
+                        <i class="fa-solid fa-address-book"></i>
+                    </div>
+
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex flex-wrap items-center gap-2">
+                            TRABAJOS
+                            <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded bg-corporate-blue text-amber-300 uppercase tracking-widest border border-amber-400/30">
+                                Directorio Oficial
+                            </span>
+                        </h1>
+
+                        <p class="text-xs text-slate-300">
+                            Buscador de Personal, Anexos y Firmas Corporativas
+                        </p>
+                    </div>
+                </div>
+
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="header-actions flex flex-wrap items-center gap-2 w-full lg:w-auto lg:justify-end">
+
+                    <button
+                        id="btnReload"
+                        onclick="loadDefaultFile()"
+                        class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-200 border border-slate-600 transition flex items-center gap-1.5"
+                    >
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>Recargar Excel</span>
+                    </button>
+
+                    <label
+                        for="excelFileInput"
+                        class="cursor-pointer px-3 py-2 text-xs font-semibold rounded-lg bg-corporate-gold hover:bg-corporate-amber text-corporate-navy shadow transition flex items-center gap-1.5"
+                    >
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Cargar Excel</span>
+                    </label>
+
+                    <input
+                        type="file"
+                        id="excelFileInput"
+                        accept=".xlsx, .xls, .csv"
+                        class="hidden"
+                    >
+
+                    <button
+                        onclick="exportData()"
+                        id="btnExport"
+                        disabled
+                        class="px-3 py-2 text-xs font-semibold rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white shadow disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1.5"
+                    >
+                        <i class="fa-solid fa-file-export"></i>
+                        <span>Exportar</span>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ESTADO DE CARGA / ZONA PARA ARRASTRAR ARCHIVOS -->
+    <div id="dropZone" class="bg-slate-200 border-b border-slate-300 text-slate-600 text-xs py-2 px-4 text-center transition-all">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+
+            <div id="statusMessage" class="flex items-start gap-2 font-medium min-w-0">
+                <i class="fa-solid fa-spinner fa-spin text-corporate-blue mt-0.5" id="statusSpinner"></i>
+                <span id="statusText">
+                    Buscando archivo de datos 'firmas.xlsx' en la carpeta local...
+                </span>
+            </div>
+
+            <div class="hidden sm:block text-slate-500 italic">
+                <i class="fa-solid fa-cloud-arrow-up mr-1"></i>
+                Arrastra y suelta tu archivo Excel aquí en cualquier momento
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5 sm:space-y-6">
+
+        <!-- MÉTRICAS -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+
+            <div class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="p-2 sm:p-3 bg-blue-50 text-corporate-blue rounded-lg text-lg sm:text-xl shrink-0">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        Total Registros
+                    </p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-800" id="statTotal">0</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="p-2 sm:p-3 bg-amber-50 text-corporate-gold rounded-lg text-lg sm:text-xl shrink-0">
+                    <i class="fa-solid fa-sitemap"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        Áreas Registradas
+                    </p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-800" id="statAreas">0</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="p-2 sm:p-3 bg-emerald-50 text-emerald-600 rounded-lg text-lg sm:text-xl shrink-0">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        Cargos Únicos
+                    </p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-800" id="statCargos">0</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="p-2 sm:p-3 bg-purple-50 text-purple-600 rounded-lg text-lg sm:text-xl shrink-0">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        Teléfonos Activos
+                    </p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-800" id="statTelefonos">0</h3>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BÚSQUEDA Y FILTROS -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 space-y-4">
+
+            <!--
+                DISEÑO RESPONSIVE:
+                Pantallas medianas y grandes:
+                - Buscador: 3 partes.
+                - Filtros: 2 partes.
+                Móviles:
+                - Buscador arriba.
+                - Filtros debajo.
+            -->
+            <div class="grid grid-cols-1 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-3 sm:gap-4 items-center">
+
+                <!-- BUSCADOR PRINCIPAL -->
+                <div class="relative w-full min-w-0">
+
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Buscar por Nombre, Cargo, Área, Teléfono..."
+                        class="w-full min-w-0 pl-11 pr-11 py-3 sm:py-3.5 bg-slate-50 border border-slate-300 rounded-lg text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-corporate-blue focus:border-transparent transition"
+                    >
+
+                    <button
+                        id="btnClearSearch"
+                        onclick="clearSearch()"
+                        class="hidden absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600"
+                    >
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                </div>
+
+                <!-- FILTROS A LA DERECHA -->
+                <div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2 sm:gap-3 min-w-0">
+
+                    <select
+                        id="filterArea"
+                        onchange="applyFilters()"
+                        class="w-full min-w-0 bg-slate-50 border border-slate-300 rounded-lg px-3 py-3 text-xs sm:text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-corporate-blue"
+                    >
+                        <option value="">Todas las Áreas</option>
+                    </select>
+
+                    <select
+                        id="filterCargo"
+                        onchange="applyFilters()"
+                        class="w-full min-w-0 bg-slate-50 border border-slate-300 rounded-lg px-3 py-3 text-xs sm:text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-corporate-blue"
+                    >
+                        <option value="">Todos los Cargos</option>
+                    </select>
+
+                    <button
+                        onclick="resetAllFilters()"
+                        class="w-full sm:col-span-2 md:col-span-1 md:w-auto px-3 sm:px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs sm:text-sm font-medium transition flex items-center justify-center gap-1.5 border border-slate-300 whitespace-nowrap"
+                    >
+                        <i class="fa-solid fa-filter-circle-xmark"></i>
+                        Limpiar
+                    </button>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- TABLA DE DATOS -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-w-0">
+
+            <!-- En móviles, la tabla se desplaza horizontalmente -->
+            <div class="overflow-x-auto w-full">
+                <table class="w-full min-w-[760px] text-left border-collapse">
+
+                    <thead>
+                        <tr class="bg-corporate-navy text-white text-xs uppercase tracking-wider font-semibold border-b border-corporate-dark">
+                            <th class="py-3 px-4">Nombres</th>
+                            <th class="py-3 px-4">Posición</th>
+                            <th class="py-3 px-4">Celular</th>
+                            <th class="py-3 px-4">Fechas</th>
+                            <th class="py-3 px-4">Nombre N.O. 4</th>
+                            <th class="py-3 px-4 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tableBody" class="divide-y divide-slate-200 text-sm">
+                        <!-- Filas dinámicas -->
+                    </tbody>
+
+                </table>
+            </div>
+
+            <!-- ESTADO VACÍO -->
+            <div id="emptyState" class="hidden py-12 px-4 text-center text-slate-500">
+                <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300"></i>
+                <p class="text-base font-medium">No se encontraron resultados</p>
+                <p class="text-xs text-slate-400 mt-1">
+                    Prueba cambiando los términos de búsqueda o los filtros aplicados
+                </p>
+            </div>
+
+            <!-- PAGINACIÓN -->
+            <div class="bg-slate-50 px-3 sm:px-4 py-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+
+                <div class="flex items-center justify-center gap-2 flex-wrap">
+                    <span>Mostrar</span>
+
+                    <select
+                        id="rowsPerPage"
+                        onchange="changePageSize()"
+                        class="bg-white border border-slate-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-corporate-blue"
+                    >
+                        <option value="25">25</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                        <option value="all">Todos</option>
+                    </select>
+
+                    <span>registros por página</span>
+                </div>
+
+                <div id="paginationInfo" class="font-medium text-center">
+                    Mostrando 0 - 0 de 0
+                </div>
+
+                <div class="flex items-center justify-center gap-1" id="paginationControls">
+
+                    <button
+                        id="btnPrev"
+                        onclick="prevPage()"
+                        disabled
+                        class="px-2 sm:px-3 py-2 rounded bg-white border border-slate-300 text-slate-500 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <i class="fa-solid fa-chevron-left"></i>
+                        <span>Anterior</span>
+                    </button>
+
+                    <span id="currentPageNum" class="px-2 sm:px-3 py-2 font-semibold text-corporate-navy">
+                        1
+                    </span>
+
+                    <button
+                        id="btnNext"
+                        onclick="nextPage()"
+                        disabled
+                        class="px-2 sm:px-3 py-2 rounded bg-white border border-slate-300 text-slate-500 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <span>Siguiente</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="bg-corporate-navy text-slate-400 text-xs py-4 border-t border-corporate-dark mt-auto">
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-3 text-center sm:text-left">
+
+            <div>
+                <span class="font-semibold text-slate-200">
+                    Riuzaki
+                </span>
+                &copy; 2026 - Sistema de Consultas de Personal
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 sm:gap-4">
+                <span class="flex items-center gap-1">
+                    <i class="fa-solid fa-shield-halved text-corporate-gold"></i>
+                    Uso Interno
+                </span>
+
+                <span class="hidden sm:inline">•</span>
+
+                <span id="dataTimestamp">Base de datos: Pendiente</span>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- NOTIFICACIONES -->
+    <div
+        id="toast"
+        class="fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-5 sm:right-5 sm:max-w-md bg-corporate-navy text-white px-4 py-3 rounded-lg shadow-xl border-l-4 border-corporate-gold hidden transition-all duration-300 z-50 items-center space-x-3"
+    >
+        <i class="fa-solid fa-circle-check text-corporate-gold text-lg" id="toastIcon"></i>
+        <span id="toastMessage" class="text-xs font-medium">Mensaje de notificación</span>
+    </div>
+
+    <!-- LÓGICA ORIGINAL DEL SISTEMA -->
+    <script>
+        // Variables de Estado Global
+        let rawData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        let pageSize = 50;
+
+        // Mapeo flexible de columnas para compatibilidad con distintos nombres en Excel
+        const COLUMN_MAPS = {
+            nombre: ['nombre', 'nombres', 'colaborador', 'personal', 'empleado', 'nombre completo', 'full name', 'trabajador'],
+            cargo: ['posición', 'posicion', 'cargo', 'puesto', 'position', 'función', 'ocupacion', 'rol'],
+            area: ['nombre n.o. 4', 'nombre n.o.4', 'n.o. 4', 'n.o.4', 'área', 'area', 'departamento', 'depto', 'gerencia', 'unidad', 'sección'],
+            telefono: ['celular', 'teléfono', 'telefono', 'anexo', 'movil', 'móvil', 'phone', 'rpc', 'rpm', 'contact'],
+            fechas: ['fechas', 'fecha', 'periodo', 'vigencia']
+        };
+
+        // Eventos al Cargar la Página
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            loadDefaultFile();
+        });
+
+        // Configuración de Listeners
+        function setupEventListeners() {
+            // Buscador en tiempo real
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const btnClear = document.getElementById('btnClearSearch');
+
+                if (e.target.value.length > 0) {
+                    btnClear.classList.remove('hidden');
+                } else {
+                    btnClear.classList.add('hidden');
+                }
+
+                applyFilters();
+            });
+
+            // File input listener
+            document.getElementById('excelFileInput').addEventListener('change', handleFileSelect);
+
+            // Drag and Drop listeners
+            const dropZone = document.body;
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    document.getElementById('dropZone').classList.add('bg-amber-100', 'border-corporate-gold');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    document.getElementById('dropZone').classList.remove('bg-amber-100', 'border-corporate-gold');
+                }, false);
+            });
+
+            dropZone.addEventListener('drop', handleDrop, false);
+        }
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Carga Automática por Defecto
+        async function loadDefaultFile() {
+            updateStatus('loading', 'Buscando archivo de datos firmas.xlsx en la carpeta local...');
+
+            const candidates = ['firmas.xlsx', 'FIRMAS.xlsx', 'Firmas.xlsx', 'data.json'];
+            let loaded = false;
+
+            for (const file of candidates) {
+                try {
+                    if (file.endsWith('.json')) {
+                        const res = await fetch(file);
+                        if (!res.ok) continue;
+
+                        const json = await res.json();
+                        processRawJsonData(json, file);
+                        loaded = true;
+                        break;
+                    } else {
+                        const res = await fetch(file);
+                        if (!res.ok) continue;
+
+                        const arrayBuffer = await res.arrayBuffer();
+                        parseExcelArrayBuffer(arrayBuffer, file);
+                        loaded = true;
+                        break;
+                    }
+                } catch (err) {
+                    console.log(`No se pudo cargar desde ${file}:`, err.message);
+                }
+            }
+
+            if (!loaded) {
+                updateStatus('warning', 'No se encontró firmas.xlsx automáticamente. Por favor selecciona o arrastra un archivo Excel.');
+            }
+        }
+
+        // Procesamiento del ArrayBuffer de Excel
+        function parseExcelArrayBuffer(buffer, fileName) {
+            try {
+                const workbook = XLSX.read(buffer, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+                if (!json || json.length === 0) {
+                    updateStatus('error', `El archivo ${fileName} no contiene datos válidos.`);
+                    return;
+                }
+
+                processRawJsonData(json, fileName);
+            } catch (err) {
+                console.error(err);
+                updateStatus('error', `Error al leer el archivo Excel ${fileName}.`);
+            }
+        }
+
+        // Manejo de carga manual vía Input o Drag & Drop
+        function handleFileSelect(e) {
+            const files = e.target.files;
+
+            if (files && files[0]) {
+                processUploadedFile(files[0]);
+            }
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files && files[0]) {
+                processUploadedFile(files[0]);
+            }
+        }
+
+        function processUploadedFile(file) {
+            updateStatus('loading', `Cargando archivo manual: ${file.name}...`);
+
+            const reader = new FileReader();
+
+            if (file.name.endsWith('.json')) {
+                reader.onload = function(e) {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        processRawJsonData(json, file.name);
+                    } catch (err) {
+                        updateStatus('error', 'El archivo JSON no es válido.');
+                    }
+                };
+
+                reader.readAsText(file);
+            } else {
+                reader.onload = function(e) {
+                    const data = new Uint8Array(e.target.result);
+                    parseExcelArrayBuffer(data, file.name);
+                };
+
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        // Normalización y mapeo estandarizado de registros
+        function processRawJsonData(data, sourceName) {
+            if (!Array.isArray(data) || data.length === 0) {
+                updateStatus('error', 'El formato de datos cargado no es compatible.');
+                return;
+            }
+
+            const sample = data[0];
+            const keys = Object.keys(sample);
+
+            const findKey = (candidates) => {
+                return keys.find(k => candidates.some(c => k.toLowerCase().trim().includes(c))) || null;
+            };
+
+            const keyNombre = findKey(COLUMN_MAPS.nombre) || keys[0] || 'Nombres';
+            const keyCargo = findKey(COLUMN_MAPS.cargo) || keys[1] || 'Posición';
+            const keyTelefono = findKey(COLUMN_MAPS.telefono) || keys[2] || 'Celular';
+            const keyFechas = findKey(COLUMN_MAPS.fechas) || keys[3] || 'Fechas';
+            const keyArea = findKey(COLUMN_MAPS.area) || keys[4] || 'Nombre N.O. 4';
+
+            rawData = data.map((item, idx) => ({
+                id: idx + 1,
+                nombre: String(item[keyNombre] || '').trim(),
+                cargo: String(item[keyCargo] || '').trim(),
+                telefono: String(item[keyTelefono] || '').trim(),
+                fechas: String(item[keyFechas] || '').trim(),
+                area: String(item[keyArea] || '').trim()
+            })).filter(item => item.nombre || item.cargo || item.area || item.telefono || item.fechas);
+
+            filteredData = [...rawData];
+            currentPage = 1;
+
+            populateDropdownFilters();
+            calculateMetrics();
+            renderTable();
+
+            document.getElementById('btnExport').disabled = false;
+
+            const now = new Date();
+
+            document.getElementById('dataTimestamp').innerText =
+                `Origen: ${sourceName} (${now.toLocaleTimeString()})`;
+
+            updateStatus('success', `Datos cargados con éxito: ${rawData.length} registros desde '${sourceName}'.`);
+            showToast(`Se cargaron ${rawData.length} registros correctamente.`);
+        }
+
+        // Poblar filtros desplegables
+        function populateDropdownFilters() {
+            const areas = [...new Set(rawData.map(i => i.area).filter(Boolean))].sort();
+            const cargos = [...new Set(rawData.map(i => i.cargo).filter(Boolean))].sort();
+
+            const selectArea = document.getElementById('filterArea');
+            const selectCargo = document.getElementById('filterCargo');
+
+            selectArea.innerHTML = '<option value="">Todas las Áreas</option>';
+
+            areas.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a;
+                opt.textContent = a;
+                selectArea.appendChild(opt);
+            });
+
+            selectCargo.innerHTML = '<option value="">Todos los Cargos</option>';
+
+            cargos.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                selectCargo.appendChild(opt);
+            });
+        }
+
+        // Cálculo de métricas
+        function calculateMetrics() {
+            document.getElementById('statTotal').innerText = rawData.length.toLocaleString();
+
+            const uniqueAreas = new Set(rawData.map(i => i.area).filter(Boolean));
+            document.getElementById('statAreas').innerText = uniqueAreas.size.toLocaleString();
+
+            const uniqueCargos = new Set(rawData.map(i => i.cargo).filter(Boolean));
+            document.getElementById('statCargos').innerText = uniqueCargos.size.toLocaleString();
+
+            const activeTels = rawData.filter(i => i.telefono && i.telefono.length >= 3);
+            document.getElementById('statTelefonos').innerText = activeTels.length.toLocaleString();
+        }
+
+        // Aplicación de filtros y búsqueda
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const selectedArea = document.getElementById('filterArea').value;
+            const selectedCargo = document.getElementById('filterCargo').value;
+
+            filteredData = rawData.filter(item => {
+                const matchesSearch = !searchTerm ||
+                    item.nombre.toLowerCase().includes(searchTerm) ||
+                    item.cargo.toLowerCase().includes(searchTerm) ||
+                    item.area.toLowerCase().includes(searchTerm) ||
+                    item.telefono.toLowerCase().includes(searchTerm) ||
+                    item.fechas.toLowerCase().includes(searchTerm);
+
+                const matchesArea = !selectedArea || item.area === selectedArea;
+                const matchesCargo = !selectedCargo || item.cargo === selectedCargo;
+
+                return matchesSearch && matchesArea && matchesCargo;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('btnClearSearch').classList.add('hidden');
+            applyFilters();
+        }
+
+        function resetAllFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('btnClearSearch').classList.add('hidden');
+            document.getElementById('filterArea').value = '';
+            document.getElementById('filterCargo').value = '';
+            applyFilters();
+        }
+
+        // Renderizado de la tabla
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            const searchTerm = document.getElementById('searchInput').value.trim();
+
+            tbody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                emptyState.classList.remove('hidden');
+                updatePaginationInfo(0, 0, 0);
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            let start = (currentPage - 1) * pageSize;
+            let end = pageSize === 'all' ? filteredData.length : start + parseInt(pageSize);
+
+            if (pageSize === 'all') {
+                start = 0;
+                end = filteredData.length;
+            }
+
+            const pageItems = filteredData.slice(start, end);
+
+            pageItems.forEach((item, index) => {
+                const tr = document.createElement('tr');
+
+                tr.className = index % 2 === 0
+                    ? 'bg-white hover:bg-slate-50 transition'
+                    : 'bg-slate-50/60 hover:bg-slate-100 transition';
+
+                const safeNombre = escapeHtml(item.nombre);
+                const safeCargo = escapeHtml(item.cargo);
+                const safeArea = escapeHtml(item.area);
+                const safeTelefono = escapeHtml(item.telefono);
+                const safeFechas = escapeHtml(item.fechas);
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-semibold text-slate-900">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-full bg-slate-200 text-corporate-navy flex items-center justify-center font-bold text-xs shrink-0">
+                                ${safeNombre ? safeNombre.charAt(0).toUpperCase() : '?'}
+                            </div>
+                            <span>${highlightText(safeNombre, searchTerm)}</span>
+                        </div>
+                    </td>
+
+                    <td class="py-3 px-4 text-slate-700">
+                        ${highlightText(safeCargo || '-', searchTerm)}
+                    </td>
+
+                    <td class="py-3 px-4 font-mono text-xs">
+                        ${safeTelefono ? `
+                            <a href="tel:${safeTelefono}" class="text-corporate-blue font-semibold hover:underline inline-flex items-center gap-1.5">
+                                <i class="fa-solid fa-phone text-emerald-600 text-[10px]"></i>
+                                ${highlightText(safeTelefono, searchTerm)}
+                            </a>
+                        ` : '<span class="text-slate-400 font-sans italic">Sin número</span>'}
+                    </td>
+
+                    <td class="py-3 px-4 text-slate-600">
+                        ${highlightText(safeFechas || '-', searchTerm)}
+                    </td>
+
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+                            ${highlightText(safeArea || 'General', searchTerm)}
+                        </span>
+                    </td>
+
+                    <td class="py-3 px-4 text-center">
+                        <button
+                            onclick="copyToClipboard('${escapeQuotes(item.nombre)} - ${escapeQuotes(item.cargo)} | Tel: ${escapeQuotes(item.telefono)} | Área: ${escapeQuotes(item.area)}')"
+                            title="Copiar datos del contacto"
+                            class="p-2 text-slate-400 hover:text-corporate-blue hover:bg-slate-100 rounded transition"
+                        >
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+
+            updatePaginationInfo(
+                start + 1,
+                Math.min(end, filteredData.length),
+                filteredData.length
+            );
+        }
+
+        // Resaltar coincidencias
+        function highlightText(text, query) {
+            if (!query || !text) return text;
+
+            const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+
+            return text.replace(regex, '<mark class="highlight">$1</mark>');
+        }
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function escapeHtml(str) {
+            if (typeof str !== 'string') return '';
+
+            return str.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                }[m];
+            });
+        }
+
+        function escapeQuotes(str) {
+            if (typeof str !== 'string') return '';
+
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        // Actualización de paginación
+        function updatePaginationInfo(start, end, total) {
+            const info = document.getElementById('paginationInfo');
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const pageNum = document.getElementById('currentPageNum');
+
+            if (total === 0) {
+                info.innerText = 'Mostrando 0 de 0 registros';
+                btnPrev.disabled = true;
+                btnNext.disabled = true;
+                pageNum.innerText = '1';
+                return;
+            }
+
+            info.innerText = `Mostrando ${start} - ${end} de ${total.toLocaleString()} registros`;
+
+            if (pageSize === 'all') {
+                btnPrev.disabled = true;
+                btnNext.disabled = true;
+                pageNum.innerText = '1 / 1';
+            } else {
+                const maxPages = Math.ceil(total / pageSize);
+
+                btnPrev.disabled = currentPage <= 1;
+                btnNext.disabled = currentPage >= maxPages;
+                pageNum.innerText = `${currentPage} / ${maxPages}`;
+            }
+        }
+
+        function changePageSize() {
+            pageSize = document.getElementById('rowsPerPage').value;
+            currentPage = 1;
+            renderTable();
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        }
+
+        function nextPage() {
+            const maxPages = Math.ceil(filteredData.length / pageSize);
+
+            if (currentPage < maxPages) {
+                currentPage++;
+                renderTable();
+            }
+        }
+
+        // Copiar al portapapeles
+        function copyToClipboard(text) {
+            const tempInput = document.createElement('textarea');
+
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            showToast('Datos copiados al portapapeles');
+        }
+
+        // Exportación de datos filtrados
+        function exportData() {
+            if (filteredData.length === 0) {
+                showToast('No hay datos para exportar', 'error');
+                return;
+            }
+
+            const exportDataArray = filteredData.map(item => ({
+                'Nombres': item.nombre,
+                'Posición': item.cargo,
+                'Celular': item.telefono,
+                'Fechas': item.fechas,
+                'Nombre N.O. 4': item.area
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(exportDataArray);
+            const workbook = XLSX.utils.book_new();
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Firmas_Antamina');
+
+            XLSX.writeFile(
+                workbook,
+                `Firmas_Antamina_Filtrado_${new Date().toISOString().slice(0, 10)}.xlsx`
+            );
+
+            showToast('Archivo Excel generado exitosamente');
+        }
+
+        // Gestor de estados
+        function updateStatus(type, message) {
+            const statusText = document.getElementById('statusText');
+            const statusSpinner = document.getElementById('statusSpinner');
+            const statusMessage = document.getElementById('statusMessage');
+
+            statusText.innerText = message;
+
+            if (type === 'loading') {
+                statusSpinner.className = 'fa-solid fa-spinner fa-spin text-corporate-blue';
+                statusMessage.className = 'flex items-center gap-2 font-medium text-slate-700';
+            } else if (type === 'success') {
+                statusSpinner.className = 'fa-solid fa-circle-check text-emerald-600';
+                statusMessage.className = 'flex items-center gap-2 font-medium text-emerald-800';
+            } else if (type === 'warning') {
+                statusSpinner.className = 'fa-solid fa-triangle-exclamation text-amber-600';
+                statusMessage.className = 'flex items-center gap-2 font-medium text-amber-800';
+            } else if (type === 'error') {
+                statusSpinner.className = 'fa-solid fa-circle-xmark text-rose-600';
+                statusMessage.className = 'flex items-center gap-2 font-medium text-rose-800';
+            }
+        }
+
+        // Notificaciones
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMessage.innerText = message;
+
+            if (type === 'error') {
+                toastIcon.className = 'fa-solid fa-circle-xmark text-rose-400 text-lg';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-check text-corporate-gold text-lg';
+            }
+
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 3000);
+        }
+    </script>
+
+</body>
+</html>
