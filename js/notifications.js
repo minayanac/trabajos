@@ -22,9 +22,9 @@ import { vapidKey } from "./firebase-config.js";
 // Estado interno
 // ======================================================
 let messaging = null;
-let currentToken = null;
-let audioCtx = null;
-let audioDesbloqueado = false;
+//let currentToken = null;
+//let audioCtx = null;
+//let audioDesbloqueado = false;
 
 // ======================================================
 // Desbloqueo de audio (política de autoplay de los navegadores)
@@ -50,9 +50,6 @@ function desbloquearAudioContext() {
     }
 }
 
-["click", "keydown", "touchstart"].forEach((evento) => {
-    document.addEventListener(evento, desbloquearAudioContext, { once: true, passive: true });
-});
 
 // ======================================================
 // Sonido (Web Audio API + archivo WAV de respaldo)
@@ -129,7 +126,7 @@ export function reproducirSonido() {
 // Reproduce el sonido de notificación repetidamente durante
 // los segundos indicados. Se usa para las alertas meteorológicas
 // (amarillo, naranja, rojo) según los nuevos requerimientos.
-let intervalSonidoAlerta = null;
+//let intervalSonidoAlerta = null;
 
 /**
  * Reproduce el sonido de alerta en bucle durante `duracionSeg` segundos.
@@ -176,53 +173,11 @@ export function detenerSonidoAlerta() {
  * @param {boolean} conSonido - si true, reproduce sonido
  */
 export function mostrarToast(titulo, mensaje, tipo = "info", conSonido = false) {
-    if (conSonido) reproducirSonido();
-
-    let contenedor = document.getElementById("toast-container");
-    if (!contenedor) {
-        contenedor = document.createElement("div");
-        contenedor.id = "toast-container";
-        document.body.appendChild(contenedor);
-    }
-
-    const toast = document.createElement("div");
-    toast.className = `toast toast-${tipo}`;
-
-    const iconos = {
-        info: "ℹ️",
-        exito: "✅",
-        alerta: "🔔"
-    };
-
-    toast.innerHTML = `
-        <div class="toast-icono">${iconos[tipo] || "ℹ️"}</div>
-        <div class="toast-cuerpo">
-            <div class="toast-titulo">${titulo}</div>
-            <div class="toast-mensaje">${mensaje}</div>
-        </div>
-        <div class="toast-cerrar">&times;</div>
-    `;
-
-    contenedor.appendChild(toast);
-
-    requestAnimationFrame(() => {
-        toast.classList.add("toast-visible");
-    });
-
-    toast.querySelector(".toast-cerrar").addEventListener("click", () => {
-        cerrarToast(toast);
-    });
-
-    const timeoutId = setTimeout(() => cerrarToast(toast), 5000);
-    toast.dataset.timeout = timeoutId;
+    //desactivado
 }
 
 function cerrarToast(toast) {
-    if (!toast || !toast.parentNode) return;
-    clearTimeout(Number(toast.dataset.timeout));
-    toast.classList.remove("toast-visible");
-    toast.classList.add("toast-saliendo");
-    setTimeout(() => toast.remove(), 300);
+  //nada
 }
 
 // ======================================================
