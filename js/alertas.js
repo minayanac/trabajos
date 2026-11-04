@@ -144,29 +144,6 @@ function asegurarEstructuraDOM() {
         </div>
     </div>
 
-    <div id="al-barra-superior" role="alert">
-        <span class="al-barra-icono" id="al-barra-icono">⚡</span>
-        <span class="al-barra-texto">
-            <span class="al-barra-nivel" id="al-barra-nivel">ALERTA ROJA</span><br>
-            <span class="al-barra-desc" id="al-barra-desc">Tormenta eléctrica intensa</span>
-        </span>
-        <span class="al-barra-tiempo" id="al-barra-tiempo">Hace 2 minutos</span>
-        <button class="al-barra-cerrar" id="al-barra-cerrar" aria-label="Cerrar barra">×</button>
-    </div>
-
-    <div id="al-tarjeta" role="alert">
-        <button class="al-tarjeta-cerrar" id="al-tarjeta-cerrar" aria-label="Cerrar tarjeta">×</button>
-        <div class="al-tarjeta-header">
-            <span class="al-tarjeta-icono" id="al-tarjeta-icono">⚡</span>
-            <div>
-                <div class="al-tarjeta-sub" id="al-tarjeta-sub">ALERTA</div>
-                <h3 class="al-tarjeta-titulo" id="al-tarjeta-titulo">Tormenta eléctrica</h3>
-            </div>
-        </div>
-        <div class="al-tarjeta-cuerpo" id="al-tarjeta-cuerpo"></div>
-        <button class="al-tarjeta-btn" id="al-tarjeta-btn">Ver</button>
-    </div>
-
     <div id="al-modal-seguridad" role="dialog" aria-modal="true">
         <div class="al-modal-contenido">
             <h3 class="al-modal-titulo">🛡️ Medidas de seguridad</h3>
@@ -190,13 +167,7 @@ function asegurarEstructuraDOM() {
     document.getElementById("al-modal-seguridad").addEventListener("click", (e) => {
         if (e.target.id === "al-modal-seguridad") cerrarModalSeguridad();
     });
-    document.getElementById("al-barra-cerrar").addEventListener("click", (e) => {
-        e.stopPropagation();
-        ocultarBarraSuperior();
-    });
-    document.getElementById("al-barra-superior").addEventListener("click", () => abrirBannerDeNuevo());
-    document.getElementById("al-tarjeta-cerrar").addEventListener("click", () => ocultarTarjeta());
-    document.getElementById("al-tarjeta-btn").addEventListener("click", () => abrirBannerDeNuevo());
+    
 
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
@@ -588,86 +559,7 @@ function abrirOverlayLibre() {
 // BARRA SUPERIOR Y TARJETA AGREGADAS
 // ==========================================================
 function actualizarBarraYTarjetaAgregadas() {
-    const barra = document.getElementById("al-barra-superior");
-    const tarjeta = document.getElementById("al-tarjeta");
-    if (!barra || !tarjeta) return;
-
-    const zonas = Array.from(estado.zonasActivas.values());
-    if (zonas.length === 0) return;
-
-    let nivelMax = NIVELES_ALERTA.vigilancia;
-    for (const z of zonas) {
-        const n = NIVELES_ALERTA[z.nivelKey];
-        if (n.orden > nivelMax.orden) nivelMax = n;
-    }
-
-    const vars = [
-        ["--al-color", nivelMax.color],
-        ["--al-color-dark", nivelMax.colorDark],
-        ["--al-glow", nivelMax.glow]
-    ];
-    const aplicarVars = (el) => {
-        if (!el) return;
-        vars.forEach(([k, v]) => el.style.setProperty(k, v));
-    };
-    aplicarVars(barra);
-    aplicarVars(tarjeta);
-
-    barra.classList.remove("al-modo-libre");
-    tarjeta.classList.remove("al-modo-libre");
-
-    document.getElementById("al-barra-icono").textContent = nivelMax.iconoBig;
-
-    if (zonas.length === 1) {
-        const z = zonas[0];
-        const n = NIVELES_ALERTA[z.nivelKey];
-        document.getElementById("al-barra-nivel").textContent =
-            (n.nombre + " " + n.icono).toUpperCase();
-        document.getElementById("al-barra-desc").textContent =
-            `${z.sectorOriginal || z.distrito} · ${z.distrito}`;
-    } else {
-        document.getElementById("al-barra-nivel").textContent =
-            `${zonas.length} ZONAS EN ALERTA`;
-        const resumen = zonas.slice()
-            .sort((a, b) => NIVELES_ALERTA[b.nivelKey].orden - NIVELES_ALERTA[a.nivelKey].orden)
-            .map(z => {
-                const n = NIVELES_ALERTA[z.nivelKey];
-                return `${n.icono} ${z.distrito}`;
-            })
-            .join(" · ");
-        document.getElementById("al-barra-desc").textContent = resumen;
-    }
-    barra.classList.add("al-visible");
-
-    document.getElementById("al-tarjeta-icono").textContent = nivelMax.iconoBig;
-
-    if (zonas.length === 1) {
-        const z = zonas[0];
-        const n = NIVELES_ALERTA[z.nivelKey];
-        document.getElementById("al-tarjeta-sub").textContent = ("ALERTA " + n.nombre).toUpperCase();
-        document.getElementById("al-tarjeta-titulo").textContent = z.titulo;
-        const cuerpo = [];
-        if (z.sectorOriginal) cuerpo.push(`<strong>🏭 Sector:</strong> ${z.sectorOriginal}`);
-        if (z.distrito)       cuerpo.push(`<strong>📍 Zona:</strong> ${z.distrito}`);
-        if (z.inicio)         cuerpo.push(`<strong>🕒 Inicio:</strong> ${z.inicio}`);
-        if (z.fin)            cuerpo.push(`<strong>⏹️ Fin previsto:</strong> ${z.fin}`);
-        cuerpo.push(`<strong>⚡ Nivel:</strong> ${n.nombre}`);
-        cuerpo.push(`<strong>⏰ Restante:</strong> ${formatearTiempo(tiempoRestanteZona(z))}`);
-        document.getElementById("al-tarjeta-cuerpo").innerHTML = cuerpo.join("<br>");
-    } else {
-        document.getElementById("al-tarjeta-sub").textContent = `${zonas.length} ZONAS EN ALERTA`;
-        document.getElementById("al-tarjeta-titulo").textContent = "Alerta múltiple";
-        const ordenadas = zonas.slice().sort((a, b) =>
-            NIVELES_ALERTA[b.nivelKey].orden - NIVELES_ALERTA[a.nivelKey].orden
-        );
-        const lineas = ordenadas.map(z => {
-            const n = NIVELES_ALERTA[z.nivelKey];
-            const t = formatearTiempo(tiempoRestanteZona(z));
-            return `${n.icono} <strong>${z.distrito}</strong> — ${n.nombre}<br>⏰ Restante: ${t}`;
-        });
-        document.getElementById("al-tarjeta-cuerpo").innerHTML = lineas.join("<br><br>");
-    }
-    tarjeta.classList.add("al-visible");
+    // Barra y tarjeta desactivadas.
 }
 
 // ==========================================================
@@ -694,43 +586,7 @@ function actualizarTimestampBarra(timestampInicio) {
 // BARRA + TARJETA LIBRE
 // ==========================================================
 export function mostrarBarraTarjetaLibre() {
-    try {
-        asegurarEstructuraDOM();
-        const nivel = NIVELES_ALERTA.vigilancia;
-        const vars = [
-            ["--al-color", nivel.color],
-            ["--al-color-dark", nivel.colorDark],
-            ["--al-glow", nivel.glow]
-        ];
-        const aplicarVars = (el) => {
-            if (!el) return;
-            vars.forEach(([k, v]) => el.style.setProperty(k, v));
-        };
-
-        const barra = document.getElementById("al-barra-superior");
-        const tarjeta = document.getElementById("al-tarjeta");
-        aplicarVars(barra);
-        aplicarVars(tarjeta);
-
-        barra?.classList.add("al-modo-libre");
-        tarjeta?.classList.add("al-modo-libre");
-
-        document.getElementById("al-barra-icono").textContent = "✅";
-        document.getElementById("al-barra-nivel").textContent = "LIBRE DE ALERTAS";
-        document.getElementById("al-barra-desc").textContent = "Sistema en vigilancia — sin alertas activas";
-        document.getElementById("al-barra-tiempo").textContent = "Vigilancia";
-        barra?.classList.add("al-visible");
-
-        document.getElementById("al-tarjeta-icono").textContent = "✅";
-        document.getElementById("al-tarjeta-sub").textContent = "VIGILANCIA";
-        document.getElementById("al-tarjeta-titulo").textContent = "Libre de alertas";
-        document.getElementById("al-tarjeta-cuerpo").innerHTML =
-            "<strong>🟢 Estado:</strong> Sin alertas meteorológicas<br>" +
-            "<strong>📍 Sistema:</strong> En vigilancia";
-        tarjeta?.classList.add("al-visible");
-    } catch (e) {
-        console.error("alertas.js: error al mostrar barra/tarjeta libre", e);
-    }
+     // No mostrar tarjetas cuando el sistema está libre.
 }
 
 // ==========================================================
