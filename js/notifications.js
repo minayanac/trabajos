@@ -16,7 +16,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-messaging.js";
 
 import { obtenerApp } from "./firebase-app.js";
-import { vapidKey } from "./firebase-config.js";
+//import { vapidKey } from "./firebase-config.js";
 
 // ======================================================
 // Estado interno
