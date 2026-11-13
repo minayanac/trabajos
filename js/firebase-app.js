@@ -5,7 +5,7 @@
 // importan este mismo módulo).
 
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
-import { firebaseConfig } from "./firebase-config.js";
+//import { firebaseConfig } from "./firebase-config.js";
 
 export function obtenerApp() {
     if (getApps().length === 0) {
