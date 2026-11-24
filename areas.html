@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Organigrama Ejecutivo & Contratistas | Compañía Minera Antamina</title>
+  <style>
+    :root {
+      --bg-main: #070d19;
+      --bg-card: #0f172a;
+      --bg-card-hover: #17233d;
+      --bg-glass: rgba(15, 23, 42, 0.85);
+      --border: #1e293b;
+      --border-accent: #38bdf8;
+      --primary: #0ea5e9;
+      --primary-glow: rgba(14, 165, 233, 0.25);
+      --secondary: #10b981;
+      --amber: #f59e0b;
+      --purple: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top right, #0f1e3a, var(--bg-main) 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.45;
+    }
+
+    /* TOPBAR DASHBOARD */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg-glass);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+    }
+    .header-inner {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0284c7, #10b981);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+    .brand h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.3px; }
+    .brand p { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* SEARCH AUTOCOMPLETE */
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 300px;
+      max-width: 580px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 11px 16px 11px 40px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #0b1222;
+      color: #fff;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .search-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+    .autocomplete-list {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      max-height: 420px;
+      overflow-y: auto;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.75);
+      display: none;
+      z-index: 60;
+    }
+    .autocomplete-list.active { display: block; }
+    .ac-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid #1e293b;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .ac-item:hover { background: #1e293b; }
+    .ac-title {
+      font-weight: 700;
+      color: #38bdf8;
+      font-size: 0.92rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .ac-tag {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      white-space: nowrap;
+    }
+    .ac-relations {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ac-rel-row {
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      background: rgba(2, 6, 23, 0.6);
+      padding: 5px 8px;
+      border-radius: 6px;
+      border-left: 3px solid var(--amber);
+    }
+
+    /* CSV UPLOAD BUTTON */
+    .actions { display: flex; gap: 10px; align-items: center; }
+    .btn {
+      padding: 9px 14px;
+      border-radius: 9px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #f8fafc;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover { border-color: var(--primary); background: #26354d; }
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      border-color: #0ea5e9;
+    }
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.74rem;
+      border-radius: 7px;
+    }
+
+    /* KPI BAR */
+    .container { max-width: 1500px; margin: 0 auto; padding: 22px 24px 60px; }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
+      background: var(--primary);
+    }
+    .kpi-card.green::after { background: var(--secondary); }
+    .kpi-card.amber::after { background: var(--amber); }
+    .kpi-card.purple::after { background: var(--purple); }
+    .kpi-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.6px; }
+    .kpi-value { font-size: 1.65rem; font-weight: 800; margin-top: 4px; }
+    .kpi-sub { font-size: 0.76rem; color: var(--text-dim); margin-top: 2px; }
+
+    /* RESULT BANNER WHEN SEARCH SELECTED */
+    .search-result-panel {
+      display: none;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(16, 185, 129, 0.08));
+      border: 1px solid var(--border-accent);
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 28px;
+    }
+    .search-result-panel.active { display: block; }
+    .sr-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .sr-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 12px;
+    }
+    .sr-card {
+      background: #0b1222;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .sr-card .lvl { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+    .sr-card strong { color: #f8fafc; }
+
+    /* ORG CHART DIAGRAM TREE */
+    .ceo-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .ceo-card {
+      background: linear-gradient(145deg, #0f294a, #0b172a);
+      border: 2px solid #38bdf8;
+      border-radius: 16px;
+      padding: 18px 32px;
+      text-align: center;
+      box-shadow: 0 12px 35px rgba(14, 165, 233, 0.22);
+      min-width: 340px;
+      position: relative;
+    }
+    .role-pill {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.18);
+      color: #38bdf8;
+      margin-bottom: 6px;
+    }
+    .ceo-card h2 { font-size: 1.15rem; font-weight: 800; }
+    .cos-badge {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed #334155;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+    }
+    .trunk-line {
+      width: 2px;
+      height: 28px;
+      background: #38bdf8;
+    }
+
+    /* VP GRID */
+    .vp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+      border-top: 2px solid #1e3a5f;
+      padding-top: 24px;
+    }
+    .vp-column {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+    .vp-column::before {
+      content: "";
+      position: absolute;
+      top: -26px;
+      left: 50%;
+      width: 2px;
+      height: 24px;
+      background: #1e3a5f;
+    }
+    .vp-header {
+      background: linear-gradient(135deg, #172554, #0f172a);
+      border: 1px solid #2563eb;
+      border-radius: 11px;
+      padding: 13px 15px;
+    }
+    .vp-header .vp-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #60a5fa;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    .vp-header h3 { font-size: 0.94rem; font-weight: 700; margin: 3px 0; color: #fff; }
+    .vp-header .vp-person { font-size: 0.82rem; color: #93c5fd; font-weight: 600; }
+
+    /* GERENCIA CARDS (ONLY CEO, VP, GERENTES SHOWN ON DIAGRAM) */
+    .ger-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      padding-left: 14px;
+      border-left: 2px solid #334155;
+      margin-left: 10px;
+    }
+    .ger-card {
+      background: var(--bg-card);
+      border: 1px solid #283548;
+      border-radius: 10px;
+      padding: 11px 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .ger-card::before {
+      content: "";
+      position: absolute;
+      left: -14px;
+      top: 50%;
+      width: 12px;
+      height: 2px;
+      background: #334155;
+    }
+    .ger-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--primary);
+      transform: translateX(3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+    .ger-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .ger-title { font-size: 0.85rem; font-weight: 700; color: #f1f5f9; }
+    .ger-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(14, 165, 233, 0.15);
+      color: #38bdf8;
+      white-space: nowrap;
+    }
+    .ger-person { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+    .ger-hint { font-size: 0.71rem; color: var(--secondary); margin-top: 5px; font-weight: 600; }
+
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 920px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+      animation: popIn 0.18s ease-out;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .modal-header h2 { font-size: 1.1rem; color: #fff; }
+    .modal-header p { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+    .close-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .modal-body {
+      padding: 18px 22px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .modal-filter {
+      width: 100%;
+      padding: 9px 13px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #090f1d;
+      color: #fff;
+      font-size: 0.86rem;
+    }
+    .subarea-box {
+      background: #0b1222;
+      border: 1px solid #1e293b;
+      border-radius: 11px;
+      padding: 14px;
+    }
+    .subarea-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1e293b;
+      margin-bottom: 10px;
+    }
+    .subarea-title { font-size: 0.88rem; font-weight: 700; color: #34d399; }
+    .subarea-lead { font-size: 0.78rem; color: var(--text-muted); }
+    .contractor-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .chip {
+      font-size: 0.77rem;
+      padding: 5px 10px;
+      border-radius: 7px;
+      background: #162033;
+      border: 1px solid #2b3b55;
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chip:hover {
+      border-color: var(--amber);
+      color: #fbbf24;
+    }
+    .chip.multi {
+      border-left: 3px solid var(--amber);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-badge">CM</div>
+      <div>
+        <h1>ORGANIGRAMA CORPORATIVO & RED DE CONTRATISTAS</h1>
+        <p>Compañía Minera Antamina • Estructura Ejecutiva y Socios Estratégicos</p>
+      </div>
+    </div>
+
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        id="globalSearch"
+        class="search-input"
+        placeholder="Buscar contratista (ej. J&V RESGUARDO), gerencia o superintendencia..."
+        autocomplete="off"
+      />
+      <div id="autocompleteList" class="autocomplete-list"></div>
+    </div>
+
+    <div class="actions">
+      <label class="btn btn-primary" title="Cargar CSV completo anta23oct (1).csv">
+        📂 Cargar CSV Completo
+        <input type="file" id="csvFileInput" accept=".csv" style="display:none" />
+      </label>
+      <button type="button" id="loadRootCsvBtn" class="btn btn-sm" title="Cargar automáticamente ./compania.csv desde la raíz">
+        ⚡ ./compania.csv
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <!-- KPI SUMMARY -->
+  <section class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Vicepresidencias / Dir.</div>
+      <div class="kpi-value" id="kpiVp">10</div>
+      <div class="kpi-sub">Reportan directamente a Presidencia CEO</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Gerencias Activas</div>
+      <div class="kpi-value" id="kpiGer">0</div>
+      <div class="kpi-sub">Haz clic en cualquier gerencia para ver detalle</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Sub-áreas / Superintendencias</div>
+      <div class="kpi-value" id="kpiSub">0</div>
+      <div class="kpi-sub">Incluye reportes matriciales</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Empresas Contratistas</div>
+      <div class="kpi-value" id="kpiComp">0</div>
+      <div class="kpi-sub">Con soporte multi-área y multi-gerencia</div>
+    </div>
+  </section>
+
+  <!-- AUTOCOMPLETE SELECTED RELATION VIEW -->
+  <section id="searchResultPanel" class="search-result-panel">
+    <div class="sr-header">
+      <div>
+        <span class="role-pill" style="background:rgba(245,158,11,0.2);color:#fbbf24;">Trazabilidad Organizacional</span>
+        <h2 id="srTitle" style="font-size:1.1rem;margin-top:2px;"></h2>
+      </div>
+      <button class="btn" onclick="closeSearchPanel()">Cerrar vista</button>
+    </div>
+    <div id="srCards" class="sr-cards"></div>
+  </section>
+
+  <!-- CEO LEVEL -->
+  <section class="ceo-section">
+    <div class="ceo-card">
+      <span class="role-pill">Presidente y CEO</span>
+      <h2>Luis Alfonso SANTIVAÑEZ SILVA</h2>
+      <div class="cos-badge">
+        <strong>Chief of Staff:</strong> Magaly Mariana Gonzáles Denegri
+      </div>
+    </div>
+    <div class="trunk-line"></div>
+  </section>
+
+  <!-- VICEPRESIDENCIAS & GERENCIAS DIAGRAM -->
+  <section id="orgGrid" class="vp-grid"></section>
+</main>
+
+<!-- MODAL POR GERENCIA -->
+<div id="gerModalBackdrop" class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <span class="role-pill" id="modalVpTag"></span>
+        <h2 id="modalGerTitle"></h2>
+        <p id="modalGerLead"></p>
+      </div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input
+        type="text"
+        id="modalFilterInput"
+        class="modal-filter"
+        placeholder="Filtrar sub-áreas o empresas contratistas dentro de esta gerencia..."
+      />
+      <div id="modalSubareasContainer" style="display:flex;flex-direction:column;gap:12px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 1. ESTRUCTURA EJECUTIVA (CEO -> VICEPRESIDENCIAS -> GERENCIAS -> SUB-ÁREAS)
+  const ORG_STRUCTURE = [
+    {
+      vp: "VICEPRESIDENCIA DE OPERACIONES",
+      vpLead: "Carlos Fredy Cotera Avellaneda",
+      gerencias: [
+        {
+          id: "GER_OP_MINA",
+          nombre: "GERENCIA DE OPERACIONES MINA",
+          gerente: "Jorge Luis Galarza Herrera",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE OPERACIONES MINA", jefe: "Jesus Ismith Cruces Herrera / Armando Agustin Vera Salhue", aliases: ["GERENCIA DE OPER. MINA", "GER OPERACIONES MINA", "SUP. CARGUÍO PERFOR. AUX"] },
+            { nombre: "SUPERINTENDENCIA DE PERFORACIÓN Y VOLADURA", jefe: "Agustin Pelagio Vasquez Yauricasa", aliases: ["SUPERIN. PERF. Y VOLADURA", "SUPER. PERFORAC. Y PROY."] },
+            { nombre: "SUPERINTENDENCIA DE GOBIERNO TÉCNICO Y OPTIMIZACIÓN DE PERFORACIÓN Y VOLADURA", jefe: "Yorhinio Nestor Leon Robles", aliases: [] },
+            { nombre: "SUPERINTENDENCIA DE VÍAS Y PROYECTOS", jefe: "Hilder Godofredo Cruz Alfaro", aliases: ["SUPERIN. VÍAS Y PROYECTOS"] },
+            { nombre: "SUPERINTENDENCIA DE GESTIÓN MINA", jefe: "Staff Operaciones Mina", aliases: ["VP OPERACIONES"] }
+          ]
+        },
+        {
+          id: "GER_CONCENTRADORA",
+          nombre: "GERENCIA DE CONCENTRADORA",
+          gerente: "David Estrella Calero",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE CONCENTRADORA", jefe: "Jacksusi Manoli Contreras Barriga / Jesus Amado Lindo Veliz", aliases: ["GERENCIA DE CONCENTRADORA", "SUP. CONCENTRADORA"] },
+            { nombre: "SUPERINTENDENCIA DE AGUAS Y RELAVES", jefe: "Erick Fernando Soto Galindo", aliases: ["SUP. AGUAS Y RELAVES"] },
+            { nombre: "SUPERINTENDENCIA DE METALURGIA Y LABORATORIO", jefe: "Hernando Francisco Valdivia Lozada", aliases: ["SUP. METALURGIA Y LAB"] },
+            { nombre: "SUPERINTENDENCIA DE MINERODUCTO", jefe: "Pedro Octavio Goicochea Gamarra", aliases: ["SUP. MINERODUCTO"] },
+            { nombre: "SUPERINTENDENCIA GENERAL PUERTO", jefe: "Eleuterio Rivera Alvarez", aliases: ["SUP. GENERAL PUERTO"] }
+          ]
+        },
+        {
+          id: "GER_MANTENIMIENTO",
+          nombre: "GERENCIA DE MANTENIMIENTO",
+          gerente: "Lino Ivan Matos Apolinario / Hugo Alberto Roman Medina (Mant. Mina)",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE MANTENIMIENTO CONCENTRADORA Y CHANCADO", jefe: "Edgar Enrique Zarate Castellares", aliases: ["SUPER MANT CONC. CHANCADO", "GERENCIA DE MANTENIMIENTO", "GER MANTENIMIENTO"] },
+            { nombre: "SUPERINTENDENCIA DE MANTENIMIENTO MINA", jefe: "Jaime Christian Huihua Huaman", aliases: ["SUP. CAMIÓN LLANTA Y EQ.L"] },
+            { nombre: "SUPERINTENDENCIA DE MANTENIMIENTO PUERTO", jefe: "Raúl Walter Aldama Meza", aliases: ["SUPERINT. MANT. PUERTO PPL"] },
+            { nombre: "SUPERINTENDENCIA DE INGENIERÍA DE MANTENIMIENTO MINA", jefe: "Gustavo Adolfo Santa Maria Vargas", aliases: ["SUP. INGENIERÍA MANT MINA"] },
+            { nombre: "SUPERINTENDENCIA DE INGENIERÍA DE MANTENIMIENTO PLANTA", jefe: "Juan José Gamboa Alvarez", aliases: ["SUP. INGENIERÍA MANT PLANTA"] },
+            { nombre: "SUPERINTENDENCIA DE SISTEMAS DE POTENCIA ELECTRICIDAD E INSTRUMENTACIÓN", jefe: "Saúl Edilberto Gutierrez Gutierrez", aliases: ["SUPER. SS.PP ELEC E INST", "GERENCIA DE ENERGIA Y ELE"] },
+            { nombre: "SUPERINTENDENCIA DE MANT. SISTEMAS AUXILIARES, CARRETERAS, EQ. LIVIANO E IZAJES", jefe: "Armando Oliver Moyonero Jordan", aliases: ["SUPERINT. MANT. SERV. GRALES"] },
+            { nombre: "SUPERINTENDENCIA DE ARMADO Y DESARMADO DE EQUIPOS", jefe: "Carlos Alberto Chin Wong", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_EXCELENCIA_OP",
+          nombre: "GERENCIA DE GESTIÓN Y EXCELENCIA OPERACIONAL",
+          gerente: "Derly Sandy Vizcarra Arias",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE EXCELENCIA OPERACIONAL", jefe: "Guillermo Gianfranco Miranda Moscol", aliases: ["GER GEST. Y EXCELENC. OPER", "GER. MEJORA DEL NEGOCIO"] },
+            { nombre: "SUPERINTENDENCIA DE INNOVACIÓN Y OPTIMIZACIÓN DE PROCESOS", jefe: "Guido Huarcaya Segovia", aliases: ["SUPERINT PROY VPO"] },
+            { nombre: "SUPERINTENDENCIA DE ENERGÍA Y REGULACIÓN DEL SECTOR ELÉCTRICO", jefe: "Saadi Joel Jiménez Romero", aliases: [] }
+          ]
+        }
+      ]
+    },
+    {
+      vp: "VICEPRESIDENCIA DE SALUD, SEGURIDAD INDUSTRIAL Y RIESGOS",
+      vpLead: "Carlos Daniel Serrano Migani",
+      gerencias: [
+        {
+          id: "GER_SEG_PATRIMONIAL",
+          nombre: "GERENCIA DE SEGURIDAD PATRIMONIAL",
+          gerente: "Giancarlo Martinelli Vargas",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE SEGURIDAD PATRIMONIAL", jefe: "Bruno Daniel Peralta Quispe", aliases: ["GER SEGURIDAD PATRIMONIAL", "SEGURIDAD"] }
+          ]
+        },
+        {
+          id: "GER_SEG_INDUSTRIAL",
+          nombre: "GERENCIA DE SEGURIDAD INDUSTRIAL",
+          gerente: "Americo Mario Ayala Soto",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE SEGURIDAD INDUSTRIAL", jefe: "Victor Cayetano Andaluz / Kelvin Poma / Waldo Hermosilla / Carlos Camacho", aliases: ["GER SEGURIDAD INDUSTRIAL", "GERENCIA SEG. INDUSTRIAL", "SUPERINT. DE SEGURIDAD", "S. SEG. VIAL Y SRV. EMERG"] }
+          ]
+        },
+        {
+          id: "GER_SALUD",
+          nombre: "GERENCIA DE SALUD",
+          gerente: "Walter Héctor Oyola Neyra",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE SALUD OCUPACIONAL", jefe: "Carlos Ivan Martinez Zegarra", aliases: ["GERENCIA DE SALUD", "SUP. DE SALUD OCUPACIONAL", "GERENCIA SALUD &SEG. IND."] },
+            { nombre: "SUPERINTENDENCIA DE HIGIENE Y ERGONOMÍA", jefe: "Marlon Cahuide Romero Vasquez", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_RIESGOS",
+          nombre: "GERENCIA DE GESTIÓN DE RIESGOS",
+          gerente: "Marco Antonio Cespedes Caballero",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE RIESGOS Y CONTINUIDAD DEL NEGOCIO", jefe: "Alex Ugo Ruju Wege", aliases: ["GER. GESTION DE RIESGOS", "VP SALUD SEGUR.INDUST.RIESG."] }
+          ]
+        }
+      ]
+    },
+    {
+      vp: "VICEPRESIDENCIA DE ADMINISTRACIÓN Y FINANZAS",
+      vpLead: "Claudia Patricia Torres Beltran",
+      gerencias: [
+        {
+          id: "GER_CADENA_ABAST",
+          nombre: "GERENCIA SENIOR DE CADENA DE ABASTECIMIENTO",
+          gerente: "Michele Gladys Villegas Vassallo",
+          subareas: [
+            { nombre: "GERENCIA DE CADENA DE ABASTECIMIENTO - OPERACIONES", jefe: "Jorge Luis Martinez Valverde", aliases: ["GERENCIA DE LOGISTICA", "GER, LOGISTICA Y C. SUM.", "SUP. PLAN. Y ADM. INVENT.", "GER. CADENA ABASTEC. - OP"] },
+            { nombre: "GERENCIA DE CADENA DE ABASTECIMIENTO PROYECTOS", jefe: "Saúl Dimas Lozano Benique", aliases: ["SUP. LOGÍSTICA PROYECTOS"] },
+            { nombre: "SUPERINTENDENCIA DE CADENA DE ABASTECIMIENTO - PDN", jefe: "Guillermo Herrera Gonzales-Pratto", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_SISTEMAS_TI",
+          nombre: "GERENCIA DE SISTEMAS, TELECOMUNICACIONES Y CONTROL DE PROCESOS",
+          gerente: "Esteban Rafael Estrada Hora",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE TELECOMUNICACIONES", jefe: "Richard Eduardo Revoredo Ferroggiaro", aliases: ["SUP. TELECOMUNICACIONES", "GERENCIA SIS. TEL. C.PRO"] },
+            { nombre: "SUPERINTENDENCIA DE SISTEMAS", jefe: "Luis Alberto Mesia Ibarra", aliases: ["SUP. DE SISTEMAS", "GERENCIA DE TEC. DE INF."] },
+            { nombre: "SUPERINTENDENCIA DE CONTROL DE PROCESOS", jefe: "Hector Jesús Paredes Chirinos", aliases: ["SUP. CONTROL DE PROCESOS"] },
+            { nombre: "SUPERINTENDENCIA DE SEGURIDAD DE LA INFORMACIÓN Y CIBERSEGURIDAD", jefe: "Angel Edgardo Perez Rivera", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_FINANZAS",
+          nombre: "GERENCIA SENIOR DE FINANZAS",
+          gerente: "Oscar Willy Valle Amado",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE TESORERÍA", jefe: "Patricia Lily Medina Alegria", aliases: ["TESORERIA", "GERENCIA DE FINANZAS"] },
+            { nombre: "SUPERINTENDENCIA DE PLANEAMIENTO Y REPORTES FINANCIEROS", jefe: "Dagiana Mabel Arana Bernedo", aliases: ["GER PLAN FIN Y CONTROL CO"] },
+            { nombre: "SUPERINTENDENCIA DE GESTIÓN DE COSTOS", jefe: "Ivan Lorenzo Villarreal Vasquez", aliases: [] },
+            { nombre: "SUPERINTENDENCIA DE CAPITAL ALLOCATION", jefe: "Melissa Rita Paredes Pacora", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_CONTRALORIA",
+          nombre: "GERENCIA DE CONTRALORÍA - CONTROLLER FINANCIERO",
+          gerente: "Enrique Ivan Saavedra Olortegui",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE CONTABILIDAD", jefe: "Roberto David Leon Wong", aliases: ["CONTABILIDAD", "SUPERINT. DE CONTABILIDAD", "CONTRALORIA"] },
+            { nombre: "SUPERINTENDENCIA DE CONTROL INTERNO", jefe: "Adela Beatriz Mañuico Nicho De Salas", aliases: [] },
+            { nombre: "SUPERINTENDENCIA DE IMPUESTOS Y PLANILLAS", jefe: "María Julia Wu Rocha", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_COMERCIAL",
+          nombre: "GERENCIA DE COMERCIAL Y TRÁFICO",
+          gerente: "Gladys Sofía Schreier O´neill",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA COMERCIAL", jefe: "Karina Vargas Caceres", aliases: ["GERENCIA COMERCIAL Y TRAF", "GERENCIA COMERCIAL", "SUPERINT. COMERCIAL"] },
+            { nombre: "SUPERINTENDENCIA DE TRÁFICO MARÍTIMO", jefe: "Patricia L. Tupac Yupanqui Bromberg", aliases: [] }
+          ]
+        }
+      ]
+    },
+    {
+      vp: "VICEPRESIDENCIA DE PORTAFOLIO DE PROYECTOS",
+      vpLead: "Néstor Enrique Deza Grados",
+      gerencias: [
+        {
+          id: "GER_PRESA_RELAVES",
+          nombre: "GERENCIA DE PRESA DE RELAVES Y OBRAS CIVILES",
+          gerente: "José Luis Zavala Lulo",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE CONSTRUCCIÓN PRESA RELAVES Y DIQUE AUXILIAR", jefe: "Alfredo Renato Rodríguez Siles", aliases: ["GER. DE PRESA RELAVES Y OC"] }
+          ]
+        },
+        {
+          id: "GER_PLANTA_OEM",
+          nombre: "GERENCIA DE PLANTA CONCENTRADORA Y OBRAS ELECTRO MECÁNICAS",
+          gerente: "Oscar Antonio Ascencion Ugarte",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE CONSTRUCCIÓN PROGRAMA PLANTA", jefe: "Freddy Edgar Quiñones Terreros", aliases: ["GER. DE PLANTA CONC Y OEM"] }
+          ]
+        },
+        {
+          id: "GER_ING_CALIDAD",
+          nombre: "GERENCIA DE INGENIERÍA Y CALIDAD",
+          gerente: "Kim Pavel Montes Rojas",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE INGENIERÍA DE OBRAS ELECTRO-MECÁNICAS", jefe: "Edwin Alfredo Reynaga Buleje", aliases: ["GER. INGENIERIA Y CALIDAD"] },
+            { nombre: "SUPERINTENDENCIA DE INGENIERÍA DE PRESA", jefe: "Luis Ronald Carruitero Valdiviezo", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_PMO_PROY",
+          nombre: "GERENCIA DE PMO Y CONTROL DE PROYECTOS",
+          gerente: "Portafolio de Proyectos",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE CONTROL DE PROYECTOS", jefe: "Arturo Enrique Peñaherrera Deza", aliases: ["GER. ENTREGA DE PROYECTOS", "GER PROC Y CONTROL PROY", "VP PORTAFOLIO DE PROYECTOS"] }
+          ]
+        }
+      ]
+    },
+    {
+      vp: "VICEPRESIDENCIA DE PLANIFICACIÓN Y DESARROLLO DE NEGOCIO",
+      vpLead: "Felipe Andrés Bunout Burr",
+      gerencias: [
+        {
+          id: "GER_LE2",
+          nombre: "GERENCIA SENIOR DE LIFE EXTENSION 02",
+          gerente: "Eduard Roux / Pierre Boulangger Lama",
+          subareas: [
+            { nombre: "GERENCIA DE ESTUDIOS LE2", jefe: "Staff LE2", aliases: ["GER DE ESTUDIOS LE2", "GERENCIA SR LE2"] },
+            { nombre: "GERENCIA DE INGENIERÍA", jefe: "Kevin John O'connell", aliases: ["GERENCIA ING. & PROYECTOS"] },
+            { nombre: "GERENCIA DE RELAVES", jefe: "Aaron Deep Sangha", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_GEOTECNIA",
+          nombre: "GERENCIA DE GEOTECNIA E HIDROGEOLOGÍA",
+          gerente: "Luis Martín Tejada Cervantes",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE DESARROLLO GEOTÉCNICO E HIDROGEOLÓGICO", jefe: "Mauro Alberto Sanchez Diaz", aliases: ["GER GEOTECNIA E HIDROGEOL", "GER GEOTEC E HIDROGEOL", "GEOTECNIA E HIDROGEOLOGIA", "GERENCIA DE GEOTECNIA", "GERENCIA PROY GEOT. HIDRO"] },
+            { nombre: "SUPERINTENDENCIA DE GEOTECNIA PRESA DE RELAVES E INFRAESTRUCTURA", jefe: "Aldo Efrain Del Carpio Alosilla", aliases: ["SUP. GEOTECNIA"] },
+            { nombre: "SUPERINTENDENCIA DE GROUND CONTROL & PIT DEWATERING", jefe: "Lloyd Williams Solorzano Poma", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_PLANEAMIENTO",
+          nombre: "GERENCIA DE PLANEAMIENTO LARGO PLAZO",
+          gerente: "Luis Richard Mamani Espinoza",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE PLANEAMIENTO MINA", jefe: "Dixon Roberto Huaman Cruzado", aliases: ["GERENCIA ING. Y PLANEAMIE", "GERENCIA PLAN LARGO PLAZO"] },
+            { nombre: "SUPERINTENDENCIA DE PLANEAMIENTO A LARGO PLAZO", jefe: "Fernando Manuel Angeles Beron", aliases: [] },
+            { nombre: "SUPERINTENDENCIA DE PLANEAMIENTO A MEDIANO PLAZO", jefe: "Carlos Reynaldo Cori Coaquera", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_GEOLOGIA",
+          nombre: "GERENCIA DE GEOLOGÍA",
+          gerente: "Angelica Felicitas Torres Fajardo",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE GEOLOGÍA", jefe: "Javier Nicolás Mercado Serruto", aliases: ["GER GEOLOGÍA PDN", "GERENCIA GEOLOGIA PDN"] },
+            { nombre: "SUPERINTENDENCIA DE PERFORACIÓN Y EXPLORACIÓN", jefe: "Jimmy Abel Becerra Chamorro", aliases: [] },
+            { nombre: "SUPERINTENDENCIA DE RECURSOS MINERALES", jefe: "Lucio Ezequiel Canchis Pérez", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_ACTIVOS_INNOV",
+          nombre: "GERENCIA DE ACTIVOS, ESTUDIOS E INNOVACIÓN",
+          gerente: "Carlos Lenin León Aguilar",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE INNOVACIÓN Y ESTUDIOS MINA", jefe: "John Casimiro Quispe Loayza", aliases: ["GER TECNOLOGIA E INNOVACIÓN", "GER ACTIV ESTUD E INNOVAC"] },
+            { nombre: "SUPERINTENDENCIA DE GESTIÓN DE INTEGRIDAD DE ACTIVOS", jefe: "Johanna Mirelle Gómez Quevedo", aliases: [] }
+          ]
+        }
+      ]
+    },
+    {
+      vp: "VICEPRESIDENCIA DE PLANIFICACIÓN Y ESTRATEGIA AMBIENTAL",
+      vpLead: "Fabiola María Sifuentes Vargas",
+      gerencias: [
+        {
+          id: "GER_MEDIO_AMB",
+          nombre: "GERENCIA DE MEDIO AMBIENTE",
+          gerente: "Roberto Carlos Manrique Arce",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE EVALUACIÓN Y ASEGURAMIENTO AMBIENTAL", jefe: "Luís Alcides Cabrera Noriega", aliases: ["SUPER SIS.GEST Y CUMP.AMB", "GERENCIA DE MEDIO AMB.", "GERENCIA MEDIO AMBIENTE", "GER MEDIO AMB"] },
+            { nombre: "SUPERINTENDENCIA DE GESTIÓN Y SERVICIOS AMBIENTALES", jefe: "Rosa Liliana Campos Guerra", aliases: ["SUP. OPERAC. AMBIENTALES", "GESTION Y SERVICIOS"] },
+            { nombre: "SUPERINTENDENCIA SOCIOAMBIENTAL", jefe: "Jesús Manuel Soriano Chávez", aliases: ["SUP. SOCIOAMBIENTAL"] }
+          ]
+        },
+        {
+          id: "GER_PLANIF_AMB",
+          nombre: "GERENCIA DE PLANIFICACIÓN AMBIENTAL",
+          gerente: "Erika Calmell del Solar Avellaneda",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE PLANIFICACIÓN AMBIENTAL", jefe: "Carla Lucia Tang Bedoya", aliases: ["SUP. PLANIFIC. AMBIENTAL", "GER PLANIF AMBIENTAL"] },
+            { nombre: "SUPERINTENDENCIA DE RECURSOS HÍDRICOS", jefe: "Sergio Daniel Yi Choy Aragon", aliases: [] }
+          ]
+        }
+      ]
+    },
+    {
+      vp: "VICEPRESIDENCIA DE SOSTENIBILIDAD Y ASUNTOS EXTERNOS",
+      vpLead: "Claudia Maria Amelia Cooper Fort",
+      gerencias: [
+        {
+          id: "GER_DES_SOSTENIBLE",
+          nombre: "GERENCIA DE DESARROLLO SOSTENIBLE",
+          gerente: "Marco Antonio Cavani Marino",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE COMPETITIVIDAD REGIONAL", jefe: "Olga Mireya Molina Pajuelo", aliases: ["GERENCIA DES. SOSTENIBLE"] },
+            { nombre: "SUPERINTENDENCIA DE DESARROLLO SOCIAL", jefe: "Manuel Oswaldo Ruiz Herrera", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_GESTION_SOCIAL",
+          nombre: "GERENCIA DE GESTIÓN SOCIAL OPERACIONES Y MINERODUCTO",
+          gerente: "Santos Andres Yepez Ruiz / Lucinda Doris Visscher Butrón",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE GESTIÓN SOCIAL - MINA", jefe: "Mirna Loy Chumbe Perez / Marco Antonio Dulanto Bautista", aliases: ["GERENCIA GESTION SOCIAL", "GER GESTIÓN SOCIAL", "RELACIONES COMUNITARIAS", "GERENCIA REL COMUNITARIAS"] },
+            { nombre: "SUPERINTENDENCIA DE UGT - VALLE FORTALEZA", jefe: "Manuel Elias Mendoza Lopez", aliases: ["VP DE SOSTENIBIL. Y AA.EE"] }
+          ]
+        },
+        {
+          id: "GER_RRII",
+          nombre: "GERENCIA SENIOR DE RELACIONES INSTITUCIONALES Y SISTEMAS DE GESTIÓN",
+          gerente: "César Liendo Vidal",
+          subareas: [
+            { nombre: "GERENCIA DE TIERRAS", jefe: "Jorge Enrique Reategui Pilco", aliases: [] },
+            { nombre: "SUPERINTENDENCIA DE RELACIONES INSTITUCIONALES Y COMUNICACIONES", jefe: "Jose Ricardo Leon Almenara", aliases: ["GERENCI COM. CORPORATIVA", "GER COM CORPORATIVA", "GER. RR.II Y TEMAS CORP.", "GERENCIA RELACIONES INST."] },
+            { nombre: "SUPERINTENDENCIA DE SISTEMAS DE GESTIÓN SOCIAL", jefe: "Doris Gisella Perea Chau", aliases: [] }
+          ]
+        }
+      ]
+    },
+    {
+      vp: "VICEPRESIDENCIA DE RECURSOS HUMANOS",
+      vpLead: "Marcela Andrea Madrid Pastene",
+      gerencias: [
+        {
+          id: "GER_TRANSPORTE_CAMP",
+          nombre: "GERENCIA DE TRANSPORTE Y CAMPAMENTO",
+          gerente: "Silvio Elviro Jara Remigio",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE TRANSPORTE Y CAMPAMENTO", jefe: "Fernando Mariano Baluarte Flores", aliases: ["GER TRANSPORTE Y CAMP", "GERENCIA TRANSP. Y CAMP.", "TRANSPORTE Y CAMPAMENTO"] },
+            { nombre: "SUPERINTENDENCIA DE CAMPAMENTO Y MANTENIMIENTO", jefe: "Julio Cesar Rojas Marin", aliases: [] }
+          ]
+        },
+        {
+          id: "GER_DES_ORG",
+          nombre: "GERENCIA DE DESARROLLO ORGANIZACIONAL",
+          gerente: "Alex Giancarlo Alcántara León",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE APRENDIZAJE ORGANIZACIONAL", jefe: "Juan José Marcos Gamarra", aliases: ["SUP. APRENDIZ. ORGANIZ."] },
+            { nombre: "SUPERINTENDENCIA DE TALENTO Y CULTURA", jefe: "Glysis Dolly Campos Escobedo", aliases: ["ATRACCION DE TALENTO", "GERENCIA ATRACCION Y DES."] }
+          ]
+        },
+        {
+          id: "GER_REL_LAB_ADMIN",
+          nombre: "GERENCIA DE RELACIONES LABORALES Y ADMINISTRACIÓN RR.HH.",
+          gerente: "Andre Linares Caceres / Lucia Giles Herrera",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA DE COMPENSACIONES Y DISEÑO ORGANIZACIONAL", jefe: "Renzo Miguel Di Tolla Mercado", aliases: ["SUP ADM.PERS. Y COMP.", "ADM DE PERSONAL Y COMPENS"] },
+            { nombre: "GERENCIA DE RELACIONES LABORALES", jefe: "Andre Linares Caceres / Moises Angel Trujillo Parraga", aliases: ["GER RELACIONES LABORALES", "VP RRHH, SEG Y COM CORP"] }
+          ]
+        }
+      ]
+    },
+    {
+      vp: "VICEPRESIDENCIA LEGAL Y CUMPLIMIENTO",
+      vpLead: "Antonio Alfonso Pinilla Cisneros",
+      gerencias: [
+        {
+          id: "GER_LEGAL",
+          nombre: "GERENCIA LEGAL Y LEGAL REGULATORIO",
+          gerente: "Gisella Paola Domecq Garces / Augusto Iván Navarro Coquis",
+          subareas: [
+            { nombre: "SUPERINTENDENCIA LEGAL", jefe: "Carmen Maria Accinelli Obando", aliases: ["GERENCIA LEGAL", "VP LEGAL Y CUMPLIMIENTO"] },
+            { nombre: "SUPERINTENDENCIA LEGAL REGULATORIO", jefe: "Vania Maria Itala Goyzueta Puccio", aliases: ["GER LEGAL REGULATORIO", "GERENCIA LEGAL REG"] },
+            { nombre: "SUPERINTENDENCIA DE SANEAMIENTO DE TIERRAS", jefe: "Fernando Enrique Piccone Bellido", aliases: [] }
+          ]
+        }
+      ]
+    },
+    {
+      vp: "GERENCIA SENIOR DE ESTRATEGIA DE RELAVES",
+      vpLead: "David Charles Machín",
+      gerencias: [
+        {
+          id: "GER_EST_RELAVES",
+          nombre: "GERENCIA DE GOBERNANZA Y ESTUDIOS DE RELAVES",
+          gerente: "Olimpia Del Rosario Cabrera Loayza / Carlos Alberto Aguirre Freyre",
+          subareas: [
+            { nombre: "GERENCIA DE GOBERNANZA DE RELAVES", jefe: "Olimpia Del Rosario Cabrera Loayza", aliases: ["GER. GOB. RELAVES"] },
+            { nombre: "GERENCIA DE ESTUDIOS DE RELAVES", jefe: "Carlos Alberto Aguirre Freyre", aliases: ["GER INGENIERIA ESTR RELAV", "GER. SR ESTRATEGIA RELAVE", "GER. SR. ESTRAT. RELAVES", "GERENCIA ESTRATEG RELAVES", "GERENCIA SR ESTRATEG RELAVES"] }
+          ]
+        }
+      ]
+    }
+  ];
+
+  // 2. BASE INICIAL DE CONTRATISTAS (INCLUYE MULTI-ÁREA COMO J&V RESGUARDO, ABB, ETC. + CARGA DINÁMICA DE CSV COMPLETO)
+  let CONTRACTOR_ROWS = [
+    { Compania: "J & V RESGUARDO S.A.C.", Area: "GER SEGURIDAD PATRIMONIAL" },
+    { Compania: "J & V RESGUARDO S.A.C.", Area: "SEGURIDAD" },
+    { Compania: "ABB S.A.", Area: "GER. DE PLANTA CONC Y OEM" },
+    { Compania: "ABB S.A.", Area: "GER. ENTREGA DE PROYECTOS" },
+    { Compania: "ABB S.A.", Area: "SUPER. SS.PP ELEC E INST" },
+    { Compania: "A & M TRANSPORTES S.R.L.", Area: "GERENCIA DE LOGISTICA" },
+    { Compania: "A&Q INGENIEROS Y CONSULTORES SAC", Area: "SUPER. SS.PP ELEC E INST" },
+    { Compania: "AB TECHNOLOGY SAC", Area: "GERENCIA DE MANTENIMIENTO" },
+    { Compania: "ABASTECEDORES Y SERVICIOS INDUSTRIALES S.A.", Area: "SUPERINT. MANT. SERV. GRALES" },
+    { Compania: "ABRATECH INGENIEROS SAC", Area: "SUPER MANT CONC. CHANCADO" },
+    { Compania: "ACCIONA TRANSMISION PERU SA", Area: "GERENCIA DE MANTENIMIENTO" }
+  ];
+
+  // INDEXADOR DE ALIAS -> SUB-ÁREA / GERENCIA / VP
+  let aliasLookup = {};
+  let companyIndex = {};
+  let currentModalGer = null;
+
+  function norm(str) {
+    return (str || "")
+      .toUpperCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function rebuildIndexes() {
+    aliasLookup = {};
+    companyIndex = {};
+
+    ORG_STRUCTURE.forEach(vpObj => {
+      vpObj.gerencias.forEach(gerObj => {
+        gerObj.subareas.forEach(subObj => {
+          subObj.contractors = new Set();
+          const keys = [subObj.nombre, ...(subObj.aliases || [])];
+          keys.forEach(k => {
+            aliasLookup[norm(k)] = { vpObj, gerObj, subObj };
+          });
+        });
+      });
+    });
+
+    CONTRACTOR_ROWS.forEach(row => {
+      const comp = (row.Compania || "").trim();
+      const area = (row.Area || "").trim();
+      if (!comp || !area) return;
+
+      const match = aliasLookup[norm(area)];
+      if (!companyIndex[comp]) companyIndex[comp] = [];
+
+      if (match) {
+        match.subObj.contractors.add(comp);
+        companyIndex[comp].push({
+          rawArea: area,
+          subarea: match.subObj.nombre,
+          jefe: match.subObj.jefe,
+          gerencia: match.gerObj.nombre,
+          gerente: match.gerObj.gerente,
+          gerId: match.gerObj.id,
+          vp: match.vpObj.vp,
+          vpLead: match.vpObj.vpLead
+        });
+      } else {
+        companyIndex[comp].push({
+          rawArea: area,
+          subarea: area,
+          jefe: "Por asignar",
+          gerencia: "ÁREA OPERATIVA / CORPORATIVA (" + area + ")",
+          gerente: "Staff Antamina",
+          gerId: null,
+          vp: "PRESIDENCIA / OPERACIONES",
+          vpLead: "Luis Alfonso SANTIVAÑEZ SILVA"
+        });
+      }
+    });
+
+    // Deduplicar relaciones exactas por empresa
+    Object.keys(companyIndex).forEach(comp => {
+      const seen = new Set();
+      companyIndex[comp] = companyIndex[comp].filter(rel => {
+        const sig = `${rel.vp}|${rel.gerencia}|${rel.subarea}|${rel.rawArea}`;
+        if (seen.has(sig)) return false;
+        seen.add(sig);
+        return true;
+      });
+    });
+
+    updateKpis();
+    renderDiagram();
+  }
+
+  function updateKpis() {
+    let gerCount = 0;
+    let subCount = 0;
+    ORG_STRUCTURE.forEach(vp => {
+      gerCount += vp.gerencias.length;
+      vp.gerencias.forEach(g => subCount += g.subareas.length);
+    });
+    document.getElementById("kpiVp").textContent = ORG_STRUCTURE.length;
+    document.getElementById("kpiGer").textContent = gerCount;
+    document.getElementById("kpiSub").textContent = subCount;
+    document.getElementById("kpiComp").textContent = Object.keys(companyIndex).length;
+  }
+
+  // RENDER SOLO CEO, VICEPRESIDENTES Y GERENTES
+  function renderDiagram() {
+    const grid = document.getElementById("orgGrid");
+    grid.innerHTML = "";
+
+    ORG_STRUCTURE.forEach(vpObj => {
+      const col = document.createElement("div");
+      col.className = "vp-column";
+
+      let gerHtml = "";
+      vpObj.gerencias.forEach(ger => {
+        const compSet = new Set();
+        ger.subareas.forEach(s => s.contractors.forEach(c => compSet.add(c)));
+
+        gerHtml += `
+          <div class="ger-card" onclick="openGerModal('${ger.id}')">
+            <div class="ger-top">
+              <div class="ger-title">${ger.nombre}</div>
+              <span class="ger-badge">${compSet.size} empresas</span>
+            </div>
+            <div class="ger-person">👤 ${ger.gerente}</div>
+            <div class="ger-hint">Clic para ver sub-áreas (${ger.subareas.length}) y contratistas →</div>
+          </div>
+        `;
+      });
+
+      col.innerHTML = `
+        <div class="vp-header">
+          <div class="vp-tag">Vicepresidencia / Dirección</div>
+          <h3>${vpObj.vp}</h3>
+          <div class="vp-person">👤 ${vpObj.vpLead}</div>
+        </div>
+        <div class="ger-list">${gerHtml}</div>
+      `;
+      grid.appendChild(col);
+    });
+  }
+
+  // MODAL POR GERENCIA
+  function openGerModal(gerId) {
+    let found = null;
+    ORG_STRUCTURE.forEach(vpObj => {
+      vpObj.gerencias.forEach(gerObj => {
+        if (gerObj.id === gerId) found = { vpObj, gerObj };
+      });
+    });
+    if (!found) return;
+
+    currentModalGer = found;
+    document.getElementById("modalVpTag").textContent = found.vpObj.vp;
+    document.getElementById("modalGerTitle").textContent = found.gerObj.nombre;
+    document.getElementById("modalGerLead").textContent = `Gerente Responsable: ${found.gerObj.gerente}`;
+    document.getElementById("modalFilterInput").value = "";
+
+    renderModalContent("");
+    document.getElementById("gerModalBackdrop").classList.add("open");
+  }
+
+  function renderModalContent(filterText) {
+    if (!currentModalGer) return;
+    const container = document.getElementById("modalSubareasContainer");
+    const q = norm(filterText);
+    container.innerHTML = "";
+
+    currentModalGer.gerObj.subareas.forEach(sub => {
+      const comps = Array.from(sub.contractors).sort();
+      const filteredComps = q
+        ? comps.filter(c => norm(c).includes(q) || norm(sub.nombre).includes(q))
+        : comps;
+
+      if (q && filteredComps.length === 0 && !norm(sub.nombre).includes(q)) return;
+
+      const chipsHtml = filteredComps.length
+        ? filteredComps.map(c => {
+            const totalAreas = (companyIndex[c] || []).length;
+            const multiTag = totalAreas > 1 ? ` title="Trabaja en ${totalAreas} áreas"` : "";
+            return `<span class="chip ${totalAreas > 1 ? 'multi' : ''}"${multiTag} onclick="selectCompany('${c.replace(/'/g, "\\'")}')">
+              🏢 ${c} ${totalAreas > 1 ? `<strong style="color:#fbbf24">(${totalAreas} áreas)</strong>` : ""}
+            </span>`;
+          }).join("")
+        : `<span style="font-size:0.78rem;color:#64748b;">Sin contratistas registrados en esta sub-área con el filtro actual.</span>`;
+
+      const box = document.createElement("div");
+      box.className = "subarea-box";
+      box.innerHTML = `
+        <div class="subarea-header">
+          <div>
+            <div class="subarea-title">📌 ${sub.nombre}</div>
+            <div class="subarea-lead">Superintendencia / Jefatura: ${sub.jefe}</div>
+          </div>
+          <span class="ger-badge">${filteredComps.length} contratistas</span>
+        </div>
+        <div class="contractor-chips">${chipsHtml}</div>
+      `;
+      container.appendChild(box);
+    });
+  }
+
+  document.getElementById("modalFilterInput").addEventListener("input", e => {
+    renderModalContent(e.target.value);
+  });
+
+  function closeModal() {
+    document.getElementById("gerModalBackdrop").classList.remove("open");
+  }
+
+  // BUSCADOR AUTOCOMPLETADO GLOBAL
+  const searchInput = document.getElementById("globalSearch");
+  const acList = document.getElementById("autocompleteList");
+
+  searchInput.addEventListener("input", () => {
+    const q = norm(searchInput.value);
+    if (q.length < 2) {
+      acList.classList.remove("active");
+      return;
+    }
+
+    const matches = Object.keys(companyIndex)
+      .filter(comp => norm(comp).includes(q))
+      .slice(0, 15);
+
+    if (!matches.length) {
+      acList.innerHTML = `<div class="ac-item"><span style="color:#94a3b8;font-size:0.84rem;">No se encontraron coincidencias. Carga el archivo CSV completo para indexar los 893 registros.</span></div>`;
+      acList.classList.add("active");
+      return;
+    }
+
+    acList.innerHTML = matches.map(comp => {
+      const rels = companyIndex[comp];
+      const relPreview = rels.map(r => `
+        <div class="ac-rel-row">
+          <strong>VP:</strong> ${r.vp}  ▸ 
+          <strong>Gerencia:</strong> ${r.gerencia}  ▸ 
+          <strong>Superintendencia/Área:</strong> ${r.subarea} <span style="color:#94a3b8">(${r.rawArea})</span>
+        </div>
+      `).join("");
+
+      return `
+        <div class="ac-item" onclick="selectCompany('${comp.replace(/'/g, "\\'")}')">
+          <div class="ac-title">
+            <span>🏢 ${comp}</span>
+            <span class="ac-tag">${rels.length} ${rels.length === 1 ? 'relación' : 'relaciones'}</span>
+          </div>
+          <div class="ac-relations">${relPreview}</div>
+        </div>
+      `;
+    }).join("");
+
+    acList.classList.add("active");
+  });
+
+  function selectCompany(compName) {
+    closeModal();
+    acList.classList.remove("active");
+    searchInput.value = compName;
+
+    const rels = companyIndex[compName] || [];
+    document.getElementById("srTitle").textContent = `${compName} — Asignado a ${rels.length} área(s)`;
+    const cards = document.getElementById("srCards");
+
+    cards.innerHTML = rels.map(r => `
+      <div class="sr-card">
+        <div style="font-size:0.74rem;color:#38bdf8;font-weight:700;">VICEPRESIDENCIA</div>
+        <div><strong>${r.vp}</strong> (${r.vpLead})</div>
+        <div class="lvl"><span style="color:#a78bfa;font-weight:700;">GERENCIA:</span> <strong>${r.gerencia}</strong> — ${r.gerente}</div>
+        <div class="lvl"><span style="color:#34d399;font-weight:700;">SUPERINTENDENCIA / SUB-ÁREA:</span> <strong>${r.subarea}</strong></div>
+        <div class="lvl"><span style="color:#fbbf24;font-weight:700;">REGISTRO CSV:</span> ${r.rawArea}</div>
+        ${r.gerId ? `<button class="btn" style="margin-top:9px;font-size:0.75rem;" onclick="openGerModal('${r.gerId}')">Abrir Modal de Gerencia →</button>` : ""}
+      </div>
+    `).join("");
+
+    document.getElementById("searchResultPanel").classList.add("active");
+  }
+
+  function closeSearchPanel() {
+    document.getElementById("searchResultPanel").classList.remove("active");
+  }
+
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".search-wrapper")) acList.classList.remove("active");
+  });
+
+  // PARSER CSV PARA CARGAR EL ARCHIVO COMPLETO anta23oct (1).csv
+  function parseCsvText(csvText, showAlert = true) {
+    const lines = csvText.split(/\r?\n/);
+    const parsed = [];
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      const m = line.match(/^"?(.*?)"?\s*,\s*"?(.*?)"?$/);
+      if (m) parsed.push({ Compania: m[1].replace(/""/g, '"'), Area: m[2].replace(/""/g, '"') });
+    }
+    if (parsed.length) {
+      CONTRACTOR_ROWS = parsed;
+      rebuildIndexes();
+      if (showAlert) {
+        alert(`Se cargaron ${parsed.length} registros y ${Object.keys(companyIndex).length} empresas contratistas únicas.`);
+      }
+    }
+  }
+
+  document.getElementById("csvFileInput").addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      parseCsvText(evt.target.result, true);
+    };
+    reader.readAsText(file, "ISO-8859-1");
+  });
+
+  document.getElementById("loadRootCsvBtn").addEventListener("click", async function() {
+    try {
+      const res = await fetch("./compania.csv", { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const buf = await res.arrayBuffer();
+      const text = new TextDecoder("iso-8859-1").decode(buf);
+      parseCsvText(text, true);
+    } catch (err) {
+      alert(`No se pudo cargar ./compania.csv desde la raíz (${err.message}). Asegúrate de abrir este archivo desde un servidor web o en el mismo directorio donde está compania.csv.`);
+    }
+  });
+
+  // INICIALIZAR
+  rebuildIndexes();
+</script>
+</body>
+</html>
