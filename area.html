@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Organigrama Ejecutivo & Contratistas | Compañía Minera Antamina</title>
+  <style>
+    :root {
+      --bg-main: #070d19;
+      --bg-card: #0f172a;
+      --bg-card-hover: #17233d;
+      --bg-glass: rgba(15, 23, 42, 0.85);
+      --border: #1e293b;
+      --border-accent: #38bdf8;
+      --primary: #0ea5e9;
+      --primary-glow: rgba(14, 165, 233, 0.25);
+      --secondary: #10b981;
+      --amber: #f59e0b;
+      --purple: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top right, #0f1e3a, var(--bg-main) 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.45;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg-glass);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+    }
+    .header-inner {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-badge {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: linear-gradient(135deg, #0284c7, #10b981);
+      display: grid; place-items: center;
+      font-weight: 800; font-size: 18px; color: #fff;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+    .brand h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.3px; }
+    .brand p { font-size: 0.78rem; color: var(--text-muted); }
+
+    .search-wrapper { position: relative; flex: 1; min-width: 280px; max-width: 540px; }
+    .search-input {
+      width: 100%; padding: 11px 16px 11px 40px;
+      border-radius: 10px; border: 1px solid #334155;
+      background: #0b1222; color: #fff; font-size: 0.92rem;
+      outline: none; transition: all 0.2s;
+    }
+    .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+    .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 15px; }
+
+    .autocomplete-list {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+      max-height: 420px; overflow-y: auto;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.75);
+      display: none; z-index: 60;
+    }
+    .autocomplete-list.active { display: block; }
+    .ac-item { padding: 12px 16px; border-bottom: 1px solid #1e293b; cursor: pointer; transition: background 0.15s; }
+    .ac-item:hover { background: #1e293b; }
+    .ac-title { font-weight: 700; color: #38bdf8; font-size: 0.92rem; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .ac-tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); white-space: nowrap; }
+    .ac-relations { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+    .ac-rel-row { font-size: 0.78rem; color: #cbd5e1; background: rgba(2, 6, 23, 0.6); padding: 5px 8px; border-radius: 6px; border-left: 3px solid var(--amber); }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .btn {
+      padding: 9px 14px; border-radius: 9px; border: 1px solid #334155;
+      background: #1e293b; color: #f8fafc; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn:hover { border-color: var(--primary); background: #26354d; }
+    .btn-primary { background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #0ea5e9; }
+    .btn-sm { padding: 6px 10px; font-size: 0.74rem; border-radius: 7px; }
+
+    .container { max-width: 1500px; margin: 0 auto; padding: 22px 24px 60px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 28px; }
+    .kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; position: relative; overflow: hidden; }
+    .kpi-card::after { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
+    .kpi-card.green::after { background: var(--secondary); }
+    .kpi-card.amber::after { background: var(--amber); }
+    .kpi-card.purple::after { background: var(--purple); }
+    .kpi-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.6px; }
+    .kpi-value { font-size: 1.65rem; font-weight: 800; margin-top: 4px; }
+    .kpi-sub { font-size: 0.76rem; color: var(--text-dim); margin-top: 2px; }
+
+    .search-result-panel {
+      display: none;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(16, 185, 129, 0.08));
+      border: 1px solid var(--border-accent); border-radius: 14px;
+      padding: 18px 22px; margin-bottom: 28px;
+    }
+    .search-result-panel.active { display: block; }
+    .sr-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .sr-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+    .sr-card { background: #0b1222; border: 1px solid #334155; border-radius: 10px; padding: 12px 14px; }
+    .sr-card .lvl { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+    .sr-card strong { color: #f8fafc; }
+
+    .ceo-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 16px; }
+    .ceo-card {
+      background: linear-gradient(145deg, #0f294a, #0b172a);
+      border: 2px solid #38bdf8; border-radius: 16px; padding: 18px 32px;
+      text-align: center; box-shadow: 0 12px 35px rgba(14, 165, 233, 0.22);
+      min-width: 340px; position: relative;
+    }
+    .role-pill {
+      display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.8px;
+      text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
+      background: rgba(56, 189, 248, 0.18); color: #38bdf8; margin-bottom: 6px;
+    }
+    .ceo-card h2 { font-size: 1.15rem; font-weight: 800; }
+    .cos-badge { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #334155; font-size: 0.8rem; color: #cbd5e1; }
+    .trunk-line { width: 2px; height: 28px; background: #38bdf8; }
+
+    .vp-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px; border-top: 2px solid #1e3a5f; padding-top: 24px;
+    }
+    .vp-column {
+      background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px; display: flex; flex-direction: column;
+      gap: 12px; position: relative;
+    }
+    .vp-column::before {
+      content: ""; position: absolute; top: -26px; left: 50%;
+      width: 2px; height: 24px; background: #1e3a5f;
+    }
+    .vp-header { background: linear-gradient(135deg, #172554, #0f172a); border: 1px solid #2563eb; border-radius: 11px; padding: 13px 15px; }
+    .vp-header .vp-tag { font-size: 0.68rem; font-weight: 700; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.6px; }
+    .vp-header h3 { font-size: 0.94rem; font-weight: 700; margin: 3px 0; color: #fff; }
+    .vp-header .vp-person { font-size: 0.82rem; color: #93c5fd; font-weight: 600; }
+
+    .ger-list { display: flex; flex-direction: column; gap: 9px; padding-left: 14px; border-left: 2px solid #334155; margin-left: 10px; }
+    .ger-card {
+      background: var(--bg-card); border: 1px solid #283548; border-radius: 10px;
+      padding: 11px 13px; cursor: pointer; transition: all 0.2s ease; position: relative;
+    }
+    .ger-card::before { content: ""; position: absolute; left: -14px; top: 50%; width: 12px; height: 2px; background: #334155; }
+    .ger-card:hover { background: var(--bg-card-hover); border-color: var(--primary); transform: translateX(3px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); }
+    .ger-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .ger-title { font-size: 0.85rem; font-weight: 700; color: #f1f5f9; }
+    .ger-badge { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: rgba(14, 165, 233, 0.15); color: #38bdf8; white-space: nowrap; }
+    .ger-person { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+    .ger-hint { font-size: 0.71rem; color: var(--secondary); margin-top: 5px; font-weight: 600; }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(6px); display: none; align-items: center;
+      justify-content: center; padding: 20px; z-index: 100;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: #0f172a; border: 1px solid #334155; border-radius: 16px;
+      width: 100%; max-width: 920px; max-height: 88vh; display: flex;
+      flex-direction: column; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+      animation: popIn 0.18s ease-out;
+    }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+    .modal-header { padding: 18px 22px; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+    .modal-header h2 { font-size: 1.1rem; color: #fff; }
+    .modal-header p { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+    .close-btn { background: #1e293b; border: 1px solid #334155; color: #fff; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 18px; }
+    .modal-body { padding: 18px 22px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
+    .modal-filter { width: 100%; padding: 9px 13px; border-radius: 8px; border: 1px solid #334155; background: #090f1d; color: #fff; font-size: 0.86rem; }
+    .subarea-box { background: #0b1222; border: 1px solid #1e293b; border-radius: 11px; padding: 14px; }
+    .subarea-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; margin-bottom: 10px; }
+    .subarea-title { font-size: 0.88rem; font-weight: 700; color: #34d399; }
+    .subarea-lead { font-size: 0.78rem; color: var(--text-muted); }
+    .contractor-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip { font-size: 0.77rem; padding: 5px 10px; border-radius: 7px; background: #162033; border: 1px solid #2b3b55; color: #e2e8f0; cursor: pointer; transition: all 0.15s; }
+    .chip:hover { border-color: var(--amber); color: #fbbf24; }
+    .chip.multi { border-left: 3px solid var(--amber); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-badge">CM</div>
+      <div>
+        <h1>ORGANIGRAMA CORPORATIVO & RED DE CONTRATISTAS</h1>
+        <p>Compañía Minera Antamina • Estructura Ejecutiva y Socios Estratégicos</p>
+      </div>
+    </div>
+
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        id="globalSearch"
+        class="search-input"
+        placeholder="Buscar contratista (ej. J&V RESGUARDO), gerencia o superintendencia..."
+        autocomplete="off"
+      />
+      <div id="autocompleteList" class="autocomplete-list"></div>
+    </div>
+
+    <div class="actions">
+      <label class="btn btn-primary" title="Cargar CSV de empresas contratistas">
+        📂 Cargar CSV Completo
+        <input type="file" id="csvFileInput" accept=".csv" style="display:none" />
+      </label>
+      <button type="button" id="loadRootCsvBtn" class="btn btn-sm" title="Cargar automáticamente ./compania.csv desde la raíz">
+        ⚡ ./compania.csv
+      </button>
+      <label class="btn btn-sm" title="Actualizar estructura y alias desde un archivo areas.csv">
+        🗂️ Cargar areas.csv
+        <input type="file" id="areasFileInput" accept=".csv" style="display:none" />
+      </label>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <section class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Vicepresidencias / Dir.</div>
+      <div class="kpi-value" id="kpiVp">0</div>
+      <div class="kpi-sub">Reportan directamente a Presidencia CEO</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Gerencias Activas</div>
+      <div class="kpi-value" id="kpiGer">0</div>
+      <div class="kpi-sub">Haz clic en cualquier gerencia para ver detalle</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Sub-áreas / Superintendencias</div>
+      <div class="kpi-value" id="kpiSub">0</div>
+      <div class="kpi-sub">Cargadas desde areas.csv</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Empresas Contratistas</div>
+      <div class="kpi-value" id="kpiComp">0</div>
+      <div class="kpi-sub">Con soporte multi-área y multi-gerencia</div>
+    </div>
+  </section>
+
+  <section id="searchResultPanel" class="search-result-panel">
+    <div class="sr-header">
+      <div>
+        <span class="role-pill" style="background:rgba(245,158,11,0.2);color:#fbbf24;">Trazabilidad Organizacional</span>
+        <h2 id="srTitle" style="font-size:1.1rem;margin-top:2px;"></h2>
+      </div>
+      <button class="btn" onclick="closeSearchPanel()">Cerrar vista</button>
+    </div>
+    <div id="srCards" class="sr-cards"></div>
+  </section>
+
+  <section class="ceo-section">
+    <div class="ceo-card">
+      <span class="role-pill">Presidente y CEO</span>
+      <h2>Luis Alfonso SANTIVAÑEZ SILVA</h2>
+      <div class="cos-badge">
+        <strong>Chief of Staff:</strong> Magaly Mariana Gonzáles Denegri
+      </div>
+    </div>
+    <div class="trunk-line"></div>
+  </section>
+
+  <section id="orgGrid" class="vp-grid"></section>
+</main>
+
+<div id="gerModalBackdrop" class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <span class="role-pill" id="modalVpTag"></span>
+        <h2 id="modalGerTitle"></h2>
+        <p id="modalGerLead"></p>
+      </div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input
+        type="text"
+        id="modalFilterInput"
+        class="modal-filter"
+        placeholder="Filtrar sub-áreas o empresas contratistas dentro de esta gerencia..."
+      />
+      <div id="modalSubareasContainer" style="display:flex;flex-direction:column;gap:12px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let ORG_STRUCTURE = [];
+  let CONTRACTOR_ROWS = [
+    { Compania: "J & V RESGUARDO S.A.C.", Area: "GER SEGURIDAD PATRIMONIAL" },
+    { Compania: "J & V RESGUARDO S.A.C.", Area: "SEGURIDAD" },
+    { Compania: "ABB S.A.", Area: "GER. DE PLANTA CONC Y OEM" },
+    { Compania: "ABB S.A.", Area: "GER. ENTREGA DE PROYECTOS" },
+    { Compania: "ABB S.A.", Area: "SUPER. SS.PP ELEC E INST" }
+  ];
+
+  let aliasLookup = {};
+  let companyIndex = {};
+  let currentModalGer = null;
+
+  function norm(str) {
+    return (str || "")
+      .toUpperCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  // PARSER CSV GENÉRICO (SOPORTA COMILLAS Y COMAS INTERNAS)
+  function parseCsvRows(csvText) {
+    const rows = [];
+    const lines = csvText.replace(/^\uFEFF/, "").split(/\r?\n/);
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const cols = [];
+      let cur = "", inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
+          else inQuotes = !inQuotes;
+        } else if (ch === "," && !inQuotes) {
+          cols.push(cur.trim());
+          cur = "";
+        } else {
+          cur += ch;
+        }
+      }
+      cols.push(cur.trim());
+      rows.push(cols);
+    }
+    return rows;
+  }
+
+  // RECONSTRUIR ORG_STRUCTURE DESDE areas.csv
+  function loadAreasFromCsvText(csvText, showAlert = false) {
+    const rawRows = parseCsvRows(csvText);
+    if (rawRows.length < 2) return;
+
+    const vpMap = new Map();
+    for (let i = 1; i < rawRows.length; i++) {
+      const [vp, vpLead, gerId, gerNombre, gerente, subNombre, jefeSub, aliasesRaw] = rawRows[i];
+      if (!vp || !gerId || !subNombre) continue;
+
+      if (!vpMap.has(vp)) {
+        vpMap.set(vp, { vp, vpLead: vpLead || "", gerMap: new Map() });
+      }
+      const vpEntry = vpMap.get(vp);
+
+      if (!vpEntry.gerMap.has(gerId)) {
+        vpEntry.gerMap.set(gerId, {
+          id: gerId,
+          nombre: gerNombre || gerId,
+          gerente: gerente || "",
+          subareas: []
+        });
+      }
+
+      const aliases = (aliasesRaw || "")
+        .split("|")
+        .map(a => a.trim())
+        .filter(Boolean);
+
+      vpEntry.gerMap.get(gerId).subareas.push({
+        nombre: subNombre,
+        jefe: jefeSub || "",
+        aliases
+      });
+    }
+
+    ORG_STRUCTURE = Array.from(vpMap.values()).map(v => ({
+      vp: v.vp,
+      vpLead: v.vpLead,
+      gerencias: Array.from(v.gerMap.values())
+    }));
+
+    rebuildIndexes();
+    if (showAlert) {
+      alert(`Estructura actualizada: ${ORG_STRUCTURE.length} Vicepresidencias y ${rawRows.length - 1} sub-áreas indexadas desde areas.csv.`);
+    }
+  }
+
+  function rebuildIndexes() {
+    aliasLookup = {};
+    companyIndex = {};
+
+    ORG_STRUCTURE.forEach(vpObj => {
+      vpObj.gerencias.forEach(gerObj => {
+        gerObj.subareas.forEach(subObj => {
+          subObj.contractors = new Set();
+          const keys = [subObj.nombre, ...(subObj.aliases || [])];
+          keys.forEach(k => {
+            aliasLookup[norm(k)] = { vpObj, gerObj, subObj };
+          });
+        });
+      });
+    });
+
+    CONTRACTOR_ROWS.forEach(row => {
+      const comp = (row.Compania || "").trim();
+      const area = (row.Area || "").trim();
+      if (!comp || !area) return;
+
+      const match = aliasLookup[norm(area)];
+      if (!companyIndex[comp]) companyIndex[comp] = [];
+
+      if (match) {
+        match.subObj.contractors.add(comp);
+        companyIndex[comp].push({
+          rawArea: area,
+          subarea: match.subObj.nombre,
+          jefe: match.subObj.jefe,
+          gerencia: match.gerObj.nombre,
+          gerente: match.gerObj.gerente,
+          gerId: match.gerObj.id,
+          vp: match.vpObj.vp,
+          vpLead: match.vpObj.vpLead
+        });
+      } else {
+        companyIndex[comp].push({
+          rawArea: area,
+          subarea: area,
+          jefe: "Por asignar",
+          gerencia: "ÁREA OPERATIVA / CORPORATIVA (" + area + ")",
+          gerente: "Staff Antamina",
+          gerId: null,
+          vp: "PRESIDENCIA / OPERACIONES",
+          vpLead: "Luis Alfonso SANTIVAÑEZ SILVA"
+        });
+      }
+    });
+
+    Object.keys(companyIndex).forEach(comp => {
+      const seen = new Set();
+      companyIndex[comp] = companyIndex[comp].filter(rel => {
+        const sig = `${rel.vp}|${rel.gerencia}|${rel.subarea}|${rel.rawArea}`;
+        if (seen.has(sig)) return false;
+        seen.add(sig);
+        return true;
+      });
+    });
+
+    updateKpis();
+    renderDiagram();
+  }
+
+  function updateKpis() {
+    let gerCount = 0, subCount = 0;
+    ORG_STRUCTURE.forEach(vp => {
+      gerCount += vp.gerencias.length;
+      vp.gerencias.forEach(g => subCount += g.subareas.length);
+    });
+    document.getElementById("kpiVp").textContent = ORG_STRUCTURE.length;
+    document.getElementById("kpiGer").textContent = gerCount;
+    document.getElementById("kpiSub").textContent = subCount;
+    document.getElementById("kpiComp").textContent = Object.keys(companyIndex).length;
+  }
+
+  function renderDiagram() {
+    const grid = document.getElementById("orgGrid");
+    grid.innerHTML = "";
+
+    ORG_STRUCTURE.forEach(vpObj => {
+      const col = document.createElement("div");
+      col.className = "vp-column";
+
+      let gerHtml = "";
+      vpObj.gerencias.forEach(ger => {
+        const compSet = new Set();
+        ger.subareas.forEach(s => s.contractors.forEach(c => compSet.add(c)));
+
+        gerHtml += `
+          <div class="ger-card" onclick="openGerModal('${ger.id}')">
+            <div class="ger-top">
+              <div class="ger-title">${ger.nombre}</div>
+              <span class="ger-badge">${compSet.size} empresas</span>
+            </div>
+            <div class="ger-person">👤 ${ger.gerente}</div>
+            <div class="ger-hint">Clic para ver sub-áreas (${ger.subareas.length}) y contratistas →</div>
+          </div>
+        `;
+      });
+
+      col.innerHTML = `
+        <div class="vp-header">
+          <div class="vp-tag">Vicepresidencia / Dirección</div>
+          <h3>${vpObj.vp}</h3>
+          <div class="vp-person">👤 ${vpObj.vpLead}</div>
+        </div>
+        <div class="ger-list">${gerHtml}</div>
+      `;
+      grid.appendChild(col);
+    });
+  }
+
+  function openGerModal(gerId) {
+    let found = null;
+    ORG_STRUCTURE.forEach(vpObj => {
+      vpObj.gerencias.forEach(gerObj => {
+        if (gerObj.id === gerId) found = { vpObj, gerObj };
+      });
+    });
+    if (!found) return;
+
+    currentModalGer = found;
+    document.getElementById("modalVpTag").textContent = found.vpObj.vp;
+    document.getElementById("modalGerTitle").textContent = found.gerObj.nombre;
+    document.getElementById("modalGerLead").textContent = `Gerente Responsable: ${found.gerObj.gerente}`;
+    document.getElementById("modalFilterInput").value = "";
+
+    renderModalContent("");
+    document.getElementById("gerModalBackdrop").classList.add("open");
+  }
+
+  function renderModalContent(filterText) {
+    if (!currentModalGer) return;
+    const container = document.getElementById("modalSubareasContainer");
+    const q = norm(filterText);
+    container.innerHTML = "";
+
+    currentModalGer.gerObj.subareas.forEach(sub => {
+      const comps = Array.from(sub.contractors).sort();
+      const filteredComps = q
+        ? comps.filter(c => norm(c).includes(q) || norm(sub.nombre).includes(q))
+        : comps;
+
+      if (q && filteredComps.length === 0 && !norm(sub.nombre).includes(q)) return;
+
+      const chipsHtml = filteredComps.length
+        ? filteredComps.map(c => {
+            const totalAreas = (companyIndex[c] || []).length;
+            const multiTag = totalAreas > 1 ? ` title="Trabaja en ${totalAreas} áreas"` : "";
+            return `<span class="chip ${totalAreas > 1 ? 'multi' : ''}"${multiTag} onclick="selectCompany('${c.replace(/'/g, "\\'")}')">
+              🏢 ${c} ${totalAreas > 1 ? `<strong style="color:#fbbf24">(${totalAreas} áreas)</strong>` : ""}
+            </span>`;
+          }).join("")
+        : `<span style="font-size:0.78rem;color:#64748b;">Sin contratistas registrados en esta sub-área con el filtro actual.</span>`;
+
+      const box = document.createElement("div");
+      box.className = "subarea-box";
+      box.innerHTML = `
+        <div class="subarea-header">
+          <div>
+            <div class="subarea-title">📌 ${sub.nombre}</div>
+            <div class="subarea-lead">Superintendencia / Jefatura: ${sub.jefe}</div>
+          </div>
+          <span class="ger-badge">${filteredComps.length} contratistas</span>
+        </div>
+        <div class="contractor-chips">${chipsHtml}</div>
+      `;
+      container.appendChild(box);
+    });
+  }
+
+  document.getElementById("modalFilterInput").addEventListener("input", e => renderModalContent(e.target.value));
+  function closeModal() { document.getElementById("gerModalBackdrop").classList.remove("open"); }
+
+  const searchInput = document.getElementById("globalSearch");
+  const acList = document.getElementById("autocompleteList");
+
+  searchInput.addEventListener("input", () => {
+    const q = norm(searchInput.value);
+    if (q.length < 2) { acList.classList.remove("active"); return; }
+
+    const matches = Object.keys(companyIndex).filter(comp => norm(comp).includes(q)).slice(0, 15);
+    if (!matches.length) {
+      acList.innerHTML = `<div class="ac-item"><span style="color:#94a3b8;font-size:0.84rem;">No se encontraron coincidencias.</span></div>`;
+      acList.classList.add("active");
+      return;
+    }
+
+    acList.innerHTML = matches.map(comp => {
+      const rels = companyIndex[comp];
+      const relPreview = rels.map(r => `
+        <div class="ac-rel-row">
+          <strong>VP:</strong> ${r.vp}  ▸ 
+          <strong>Gerencia:</strong> ${r.gerencia}  ▸ 
+          <strong>Superintendencia/Área:</strong> ${r.subarea} <span style="color:#94a3b8">(${r.rawArea})</span>
+        </div>
+      `).join("");
+
+      return `
+        <div class="ac-item" onclick="selectCompany('${comp.replace(/'/g, "\\'")}')">
+          <div class="ac-title">
+            <span>🏢 ${comp}</span>
+            <span class="ac-tag">${rels.length} ${rels.length === 1 ? 'relación' : 'relaciones'}</span>
+          </div>
+          <div class="ac-relations">${relPreview}</div>
+        </div>
+      `;
+    }).join("");
+    acList.classList.add("active");
+  });
+
+  function selectCompany(compName) {
+    closeModal();
+    acList.classList.remove("active");
+    searchInput.value = compName;
+
+    const rels = companyIndex[compName] || [];
+    document.getElementById("srTitle").textContent = `${compName} — Asignado a ${rels.length} área(s)`;
+    document.getElementById("srCards").innerHTML = rels.map(r => `
+      <div class="sr-card">
+        <div style="font-size:0.74rem;color:#38bdf8;font-weight:700;">VICEPRESIDENCIA</div>
+        <div><strong>${r.vp}</strong> (${r.vpLead})</div>
+        <div class="lvl"><span style="color:#a78bfa;font-weight:700;">GERENCIA:</span> <strong>${r.gerencia}</strong> — ${r.gerente}</div>
+        <div class="lvl"><span style="color:#34d399;font-weight:700;">SUPERINTENDENCIA / SUB-ÁREA:</span> <strong>${r.subarea}</strong></div>
+        <div class="lvl"><span style="color:#fbbf24;font-weight:700;">REGISTRO CSV:</span> ${r.rawArea}</div>
+        ${r.gerId ? `<button class="btn" style="margin-top:9px;font-size:0.75rem;" onclick="openGerModal('${r.gerId}')">Abrir Modal de Gerencia →</button>` : ""}
+      </div>
+    `).join("");
+
+    document.getElementById("searchResultPanel").classList.add("active");
+  }
+
+  function closeSearchPanel() { document.getElementById("searchResultPanel").classList.remove("active"); }
+  document.addEventListener("click", e => { if (!e.target.closest(".search-wrapper")) acList.classList.remove("active"); });
+
+  function parseCompaniaCsv(csvText, showAlert = true) {
+    const rawRows = parseCsvRows(csvText);
+    const parsed = [];
+    for (let i = 1; i < rawRows.length; i++) {
+      const [comp, area] = rawRows[i];
+      if (comp && area) parsed.push({ Compania: comp, Area: area });
+    }
+    if (parsed.length) {
+      CONTRACTOR_ROWS = parsed;
+      rebuildIndexes();
+      if (showAlert) {
+        alert(`Se cargaron ${parsed.length} registros y ${Object.keys(companyIndex).length} empresas contratistas únicas.`);
+      }
+    }
+  }
+
+  // BOTÓN MANUAL COMPANIA.CSV
+  document.getElementById("csvFileInput").addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => parseCompaniaCsv(evt.target.result, true);
+    reader.readAsText(file, "ISO-8859-1");
+  });
+
+  // BOTÓN AUTOMÁTICO DESDE RAÍZ ./compania.csv
+  document.getElementById("loadRootCsvBtn").addEventListener("click", async function() {
+    try {
+      const res = await fetch("./compania.csv", { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const buf = await res.arrayBuffer();
+      const text = new TextDecoder("iso-8859-1").decode(buf);
+      parseCompaniaCsv(text, true);
+    } catch (err) {
+      alert(`No se pudo cargar ./compania.csv desde la raíz (${err.message}).`);
+    }
+  });
+
+  // BOTÓN MANUAL AREAS.CSV
+  document.getElementById("areasFileInput").addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => loadAreasFromCsvText(evt.target.result, true);
+    reader.readAsText(file, "UTF-8");
+  });
+
+  // AUTO-CARGA INICIAL DESDE ./areas.csv EN LA RAÍZ
+  (async function init() {
+    try {
+      const res = await fetch("./areas.csv", { cache: "no-store" });
+      if (res.ok) {
+        const text = await res.text();
+        loadAreasFromCsvText(text, false);
+        return;
+      }
+    } catch (e) {
+      console.warn("No se encontró ./areas.csv automático, usa el botón 🗂️ Cargar areas.csv", e);
+    }
+    rebuildIndexes();
+  })();
+</script>
+</body>
+</html>
